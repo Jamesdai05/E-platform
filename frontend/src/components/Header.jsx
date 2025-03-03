@@ -14,7 +14,7 @@ const Header = () => {
     <Navbar expand="lg" bg="dark" variant="dark">
       <Container>
         <Navbar.Brand href="/">
-          <img src={logo} alt="logo"/>
+          <img src={logo} alt="logo" style={{height:"50px",}}/>
           E-shop
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
