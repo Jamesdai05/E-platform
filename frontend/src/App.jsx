@@ -11,6 +11,7 @@ function App() {
       <Header />
       <Container>
         <main className='pt-3 content'>
+          <h2>Latest Products</h2>
           <Productslist products={products} />
         </main>
       </Container>
