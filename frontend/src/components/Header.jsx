@@ -1,9 +1,7 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
 import logo from "../logo-eshop.jpg" ;
-// import Container from "react-bootstrap/Container";
-// import Nav from "react-bootstrap/Nav";
-// import Navbar from "react-bootstrap/Navbar";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 
 const Header = () => {
@@ -13,7 +11,7 @@ const Header = () => {
   return (
     <Navbar expand="lg" bg="dark" variant="dark">
       <Container>
-        <Navbar.Brand href="/">
+        <Navbar.Brand as={Link} to="/">
           <img src={logo} alt="logo" style={{height:"50px",}}/>
           E-shop
         </Navbar.Brand>
@@ -24,10 +22,10 @@ const Header = () => {
             <Nav.Link href="#link">Link</Nav.Link>
           </Nav> */}
           <Nav className="ms-auto">
-            <Nav.Link href="/cart" style={fsStyle}>
+            <Nav.Link as={Link} to="/cart" style={fsStyle}>
               Cart <FaShoppingCart className="ms-0.5" />
             </Nav.Link>
-            <Nav.Link href="/login" style={fsStyle}>
+            <Nav.Link as={Link} to="/login" style={fsStyle}>
               User <FaUser className="ms-0.5" />
             </Nav.Link>
           </Nav>

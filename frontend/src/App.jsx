@@ -2,18 +2,16 @@ import './App.css';
 import Footer from './components/Footer.jsx';
 import Header from './components/Header.jsx';
 import { Container } from 'react-bootstrap';
-import Productslist from './components/Productlist.jsx';
-import products from './products.js';
+// import Productslist from './components/Productlist.jsx';
+// import products from './products.js';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
       <Header />
       <Container>
-        <main className='pt-3 content'>
-          <h2>Latest Products</h2>
-          <Productslist products={products} />
-        </main>
+        <Outlet />
       </Container>
       <Footer />
     </div>
