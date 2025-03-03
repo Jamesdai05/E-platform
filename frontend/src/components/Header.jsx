@@ -1,8 +1,10 @@
-import { Container, Nav, Navbar, Badge, NavDropdown } from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
+import logo from "../logo-eshop.jpg" ;
 // import Container from "react-bootstrap/Container";
 // import Nav from "react-bootstrap/Nav";
 // import Navbar from "react-bootstrap/Navbar";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
+
 
 const Header = () => {
 
@@ -12,6 +14,7 @@ const Header = () => {
     <Navbar expand="lg" bg="dark" variant="dark">
       <Container>
         <Navbar.Brand href="/">
+          <img src={logo} alt="logo"/>
           E-shop
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
