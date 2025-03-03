@@ -9,7 +9,7 @@ function App() {
     <div className="App">
       <Header />
       <Container>
-        <main className='pt-3'>
+        <main className='pt-3 content'>
           <h2>Welcome to the platform!</h2>
         </main>
       </Container>
