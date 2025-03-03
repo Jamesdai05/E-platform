@@ -1,9 +1,37 @@
-body {
+/* body {
   overflow:hidden;
-}
+} */
 
 .content {
   min-height: 88vh;
+}
+
+.rating span {
+  margin: 0.1rem;
+}
+
+.rating svg {
+  color: #f8e825;
+}
+
+.rating-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding-left: 0.5rem;
+}
+
+/* to set the card to be the same size */
+.title {
+  height: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+}
+
+.footer {
+  position: absolute;
+  margin-top: 1rem;
+  left: calc(50vw - 25px);
 }
 
 
