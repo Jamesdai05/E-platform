@@ -9,7 +9,7 @@ import CartPage from './Pages/CartPage.jsx';
 import LoginPage from './Pages/LoginPage.jsx';
 import ProductDetails from './Pages/ProductDetails.jsx';
 import { Provider } from 'react-redux';
-import store from '../store.js';
+import store from './store.js';
 
 
 const router=createBrowserRouter(
