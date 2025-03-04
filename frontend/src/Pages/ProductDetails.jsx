@@ -1,20 +1,29 @@
 import { Col, Image, ListGroup, Row,Button,Card } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
 import Rating from '../components/Rating.jsx';
-import products from '../products.js';
-
+// import products from '../products.js';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 
 
 const ProductDetails = () => {
+  const [product, setProduct] = useState({});
 
-  const {id:productId}=useParams()
+  const { id: productId } = useParams();
+  const url=`/api/products/${productId}`
 
-  // const product=products.filter(item=>item._id===productId)
-  // console.log(product[0])
+  useEffect(() => {
+    const dataFetch = async () => {
+      const { data } = await axios.get(url);
+      console.log(data);
+      setProduct(data);
+    };
+    dataFetch();
+  }, [productId]);
 
-  const product = products.find((item) => item._id === productId);
-  console.log(product);
+  // const product = products.find((item) => item._id === productId);
+  // console.log(product);
 
   return (
     <>
@@ -67,7 +76,6 @@ const ProductDetails = () => {
                   className="btn-block"
                   type="button"
                   disabled={product.countInStock === 0}
-
                 >
                   Add To Cart
                 </Button>

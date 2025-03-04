@@ -13,7 +13,7 @@ const Home = () => {
   useEffect(()=>{
     const dataFetch = async () => {
       const { data } = await axios.get(productsUrl);
-      console.log(data);
+      // console.log(data);
       setProducts(data);
     };
     dataFetch()
