@@ -1,0 +1,23 @@
+{
+  "name": "ecommerce-platform-v2",
+  "version": "1.0.0",
+  "description": "MERN stack to build an ecommerce platform.",
+  "keywords": [
+    "MERN"
+  ],
+  "homepage": "https://github.com/Jamesdai05/E-platform#readme",
+  "bugs": {
+    "url": "https://github.com/Jamesdai05/E-platform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jamesdai05/E-platform.git"
+  },
+  "license": "MIT",
+  "author": "James Dai",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

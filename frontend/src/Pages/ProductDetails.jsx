@@ -10,8 +10,11 @@ const ProductDetails = () => {
 
   const {id:productId}=useParams()
 
-  const product=products.filter(item=>item._id===productId)
-  console.log(product[0])
+  // const product=products.filter(item=>item._id===productId)
+  // console.log(product[0])
+
+  const product = products.find((item) => item._id === productId);
+  console.log(product);
 
   return (
     <>
@@ -20,21 +23,21 @@ const ProductDetails = () => {
       </Link>
       <Row>
         <Col md={5}>
-          <Image src={product[0].image} alt={product[0].name} fluid />
+          <Image src={product.image} alt={product.name} fluid />
         </Col>
         <Col md={4}>
           <ListGroup variant="flush">
             <ListGroup.Item>
-              <h3>{product[0].name}</h3>
+              <h3>{product.name}</h3>
             </ListGroup.Item>
             <ListGroup.Item>
               <Rating
-                value={product[0].rating}
-                text={`${product[0].numReviews} reviews`}
+                value={product.rating}
+                text={`${product.numReviews} reviews`}
               />
             </ListGroup.Item>
-            <ListGroup.Item>Price: ${product[0].price}</ListGroup.Item>
-            <ListGroup.Item>Description: {product[0].description}</ListGroup.Item>
+            <ListGroup.Item>Price: ${product.price}</ListGroup.Item>
+            <ListGroup.Item>Description: {product.description}</ListGroup.Item>
           </ListGroup>
         </Col>
         <Col md={3}>
@@ -44,7 +47,7 @@ const ProductDetails = () => {
                 <Row>
                   <Col>Price:</Col>
                   <Col>
-                    <b>${product[0].price}</b>
+                    <b>${product.price}</b>
                   </Col>
                 </Row>
               </ListGroup.Item>
@@ -53,7 +56,7 @@ const ProductDetails = () => {
                   <Col>Status:</Col>
                   <Col>
                     <strong>
-                      {product[0].countInStock > 0 ? "In Stock" : "Out Of Stock"}
+                      {product.countInStock > 0 ? "In Stock" : "Out Of Stock"}
                     </strong>
                   </Col>
                 </Row>
@@ -63,7 +66,7 @@ const ProductDetails = () => {
                 <Button
                   className="btn-block"
                   type="button"
-                  disabled={product[0].countInStock === 0}
+                  disabled={product.countInStock === 0}
 
                 >
                   Add To Cart
