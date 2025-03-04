@@ -1,7 +1,7 @@
 import { Col, Row } from "react-bootstrap";
 import Product from "./Product";
 
-const Productslist = ({ products }) => {
+const Productlist = ({ products }) => {
   return (
     <Row>
       {products.map((product) => (
@@ -12,4 +12,4 @@ const Productslist = ({ products }) => {
     </Row>
   );
 };
-export default Productslist;
+export default Productlist;

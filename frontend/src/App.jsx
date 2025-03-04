@@ -10,9 +10,11 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <Container>
-        <Outlet />
-      </Container>
+      <main className="py-3 content">
+        <Container>
+          <Outlet />
+        </Container>
+      </main>
       <Footer />
     </div>
   );

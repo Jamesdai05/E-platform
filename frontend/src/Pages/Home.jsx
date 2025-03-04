@@ -1,4 +1,4 @@
-import Productslist from "../components/Productlist.jsx";
+import Productlist from "../components/Productlist.jsx";
 import products from "../products";
 
 
@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <>
       <h1>Latest Products</h1>
-      <Productslist products={products} style={style} />
+      <Productlist products={products} style={style} />
     </>
   );
 };
