@@ -21,7 +21,9 @@
     "dev": "node backend/server.js",
     "server": "nodemon backend/server.js",
     "client": "npm start --prefix frontend",
-    "test": "concurrently \"npm run server\" \"npm run client\""
+    "test": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "node backend/seed.js",
+    "data:delete": "node backend/seed.js -d"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
