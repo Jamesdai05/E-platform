@@ -1,6 +1,5 @@
 const products = [
   {
-    _id: '1',
     name: 'Airpods Wireless Bluetooth Headphones',
     image: '/images/airpods.jpg',
     description:
@@ -13,7 +12,6 @@ const products = [
     numReviews: 12,
   },
   {
-    _id: '2',
     name: 'iPhone 11 Pro 256GB Memory',
     image: '/images/phone.jpg',
     description:
@@ -26,7 +24,6 @@ const products = [
     numReviews: 8,
   },
   {
-    _id: '3',
     name: 'Cannon EOS 80D DSLR Camera',
     image: '/images/camera.jpg',
     description:
@@ -39,7 +36,6 @@ const products = [
     numReviews: 12,
   },
   {
-    _id: '4',
     name: 'Sony Playstation 4 Pro White Version',
     image: '/images/playstation.jpg',
     description:
@@ -52,7 +48,6 @@ const products = [
     numReviews: 12,
   },
   {
-    _id: '5',
     name: 'Logitech G-Series Gaming Mouse',
     image: '/images/mouse.jpg',
     description:
@@ -65,7 +60,6 @@ const products = [
     numReviews: 10,
   },
   {
-    _id: '6',
     name: 'Amazon Echo Dot 3rd Generation',
     image: '/images/alexa.jpg',
     description:
@@ -78,7 +72,6 @@ const products = [
     numReviews: 12,
   },
   {
-    _id: '7',
     name: 'Xiaomi Redmi Pad Pro (8GB RAM + 256GB Storage)',
     image: '/images/xiaomi.jpg',
     description:
@@ -91,7 +84,6 @@ const products = [
     numReviews: 47,
   },
   {
-    _id: '8',
     name: 'Logitech MX Master 3S - Wireless Performance Mouse',
     image: '/images/logi_mouse.jpg',
     description:
@@ -104,7 +96,6 @@ const products = [
     numReviews: 6371,
   },
   {
-    _id: '9',
     name: 'Logitech M331 SILENT PLUS Wireless Mouse with Nano Receiver',
     image: '/images/logiMouse.jpg',
     description:
@@ -118,7 +109,6 @@ const products = [
   },
 
   {
-    _id: '10',
     name: 'Xbox Wireless Controller(Carbon Black)',
     image: '/images/console.jpg',
     description:
@@ -132,7 +122,6 @@ const products = [
   },
 
   {
-    _id: '11',
     name: 'UGREEN Revodok 105 USB C Hub 5 in 1 Multiport Adapter',
     image: '/images/ugreen.jpg',
     description:
@@ -146,7 +135,6 @@ const products = [
   },
 
   {
-    _id: '12',
     name: 'JBL Charge 5 Portable Bluetooth Speaker, Black',
     image: '/images/JBL_speaker.jpg',
     description:
