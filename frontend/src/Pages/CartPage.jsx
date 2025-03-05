@@ -8,13 +8,14 @@ import {
   Row,
 } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Message from "../components/Message";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, removeFromCart } from "../slices/cartSlice.js";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const cart = useSelector((state) => state.cart);
   const { cartItems } = cart;
@@ -27,6 +28,11 @@ const CartPage = () => {
   // to remove the item from the cart.
   const removeFromCartHandler = async (id) => {
     dispatch(removeFromCart(id));
+  };
+
+  //if login then direct to shipping.
+  const checkOutHandler = () => {
+    navigate("/login?redirect=/shipping");
   };
 
 
@@ -103,6 +109,7 @@ const CartPage = () => {
                 variant="primary"
                 className="btn-block"
                 disabled={cartItems.length === 0}
+                onClick={checkOutHandler}
               >
                 Proceed To Checkout
               </Button>
