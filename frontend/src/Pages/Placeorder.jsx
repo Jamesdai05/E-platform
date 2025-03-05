@@ -3,6 +3,8 @@ import CheckoutComponent from "../components/CheckoutComponent.jsx";
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from "react-router-dom";
 import Message from "../components/Message.jsx";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 
 
@@ -13,9 +15,20 @@ const Placeorder = () => {
   const navigate=useNavigate();
 
   const cart=useSelector(state=>state.cart);
+  const {shippingAddress}=cart;
 
+  useEffect(() => {
+    if (!cart.shippingAddress.address) {
+      navigate("/shipping");
+    } else if (!cart.paymentMethod) {
+      navigate("/payment");
+    }
+  }, [cart.paymentMethod,cart,shippingAddress.address,navigate]);
 
-
+  const handleOrderSubmit = (e) => {
+    e.preventDefault();
+    console.log("Order submmit!");
+  };
 
   return (
     <>
@@ -111,6 +124,16 @@ const Placeorder = () => {
                   <Col>TotalPrice:</Col>
                   <Col>${cart.totalPrice}</Col>
                 </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={cart.cartItems.length === 0}
+                  onClick={handleOrderSubmit}
+                >
+                  Place Order
+                </Button>
               </ListGroup.Item>
             </ListGroup>
           </Card>

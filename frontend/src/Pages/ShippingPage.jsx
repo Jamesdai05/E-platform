@@ -20,6 +20,9 @@ const ShippingPage = () => {
   const [postalCode, setPostalCode] = useState(shippingAddress?.postalCode || "");
   const [country, setCountry] = useState(shippingAddress?.country || "");
 
+
+
+
   const handleSubmit=(e)=>{
     e.preventDefault();
     dispatch(saveShippingAddress({ address, city, postalCode, country }));
