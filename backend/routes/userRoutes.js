@@ -9,6 +9,7 @@ import {
   logOut,
   updateUserProfile,
   getUserProfile } from '../controllers/userController.js';
+import { adminRoute, protectRoute } from '../middleware/authMiddleware.js';
 
 
 
@@ -26,7 +27,7 @@ router.post("/logout",logOut)
 router.post("/login",authUser)
 
 // get user profile and update user profile
-router.route("/profile").get(getUserProfile).put(updateUserProfile)
+router.route("/profile").get(protectRoute,getUserProfile).put(protectRoute,updateUserProfile)
 
 // admin function
 router.route("/:id").get(getUserById).delete(deleteUserById).put(updateUserById)
