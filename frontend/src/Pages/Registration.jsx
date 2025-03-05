@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/Loader.jsx";
 import { setCredentials } from "../slices/authSlice.js";
-import { useLoginMutation } from "../slices/usersApiSlice.js";
 import { toast } from "react-toastify";
+import { useRegistrationMutation } from "../slices/usersApiSlice.js";
 
 
 const Registration = () => {
@@ -18,7 +18,7 @@ const Registration = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [registration, { isLoading }] = useRegistrationMutation();
   //get the user from the state
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -45,21 +45,19 @@ const Registration = () => {
     if (!email || !password || !confirmPassword ||!name) {
       toast.error("Please fill in all fields!");
       return;
+    }else{
+      try {
+        const res = await registration({ email, password,name }).unwrap();
+        dispatch(setCredentials({ ...res }));
+        navigate(redirect);
+      } catch (err) {
+        console.log(err);
+        toast.error(err?.data?.message || err?.error);
+      }
     }
-
-    try {
-      const res = await login({ email, password }).unwrap();
-      dispatch(setCredentials({ ...res }));
-      navigate(redirect);
-    } catch (err) {
-      console.log(err);
-      toast.error(err?.data?.message || err?.error);
-    }
-
-    // console.log(email, password);
   };
 
-  // console.log(localStorage.getItem("userInfo"))
+
 
   return (
     <FormContainer>
