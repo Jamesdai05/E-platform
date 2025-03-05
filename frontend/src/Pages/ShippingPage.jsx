@@ -2,9 +2,14 @@ import { useState } from "react";
 import FormContainer from "../components/FormContainer.jsx";
 import CheckoutComponent from '../components/CheckoutComponent';
 import { Button, Form } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {saveShippingAddress} from "../slices/cartSlice.js"
 
 const ShippingPage = () => {
+
+  const dispatch=useDispatch();
+  const navigate=useNavigate();
 
   const cart=useSelector(state=>state.cart);
   const {shippingAddress}=cart;
@@ -17,8 +22,10 @@ const ShippingPage = () => {
 
   const handleSubmit=(e)=>{
     e.preventDefault();
-    console.log("Submitted")
+    dispatch(saveShippingAddress({ address, city, postalCode, country }));
+    navigate("/payment");
   }
+
 
 
   return (

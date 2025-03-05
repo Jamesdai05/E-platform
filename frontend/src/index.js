@@ -13,6 +13,8 @@ import store from './store.js';
 import Registration from './Pages/Registration.jsx';
 import ProfilePage from './Pages/ProfilePage.jsx';
 import ShippingPage from './Pages/ShippingPage.jsx';
+import Payment from './Pages/Payment.jsx';
+import Placeorder from './Pages/Placeorder.jsx';
 
 
 const router=createBrowserRouter(
@@ -25,6 +27,8 @@ const router=createBrowserRouter(
       <Route path='/register' element={<Registration />}/>
       <Route path='/profile' element={<ProfilePage />}/>
       <Route path='/shipping' element={<ShippingPage />}/>
+      <Route path='/payment' element={<Payment />}/>
+      <Route path='/placeorder' element={<Placeorder />}/>
     </Route>
   )
 )
