@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-
+import { clearCartItems } from "../slices/cartSlice.js";
+import { useCreateOrdersMutation } from "../slices/orderSlice.js";
 
 
 
@@ -25,9 +26,24 @@ const Placeorder = () => {
     }
   }, [cart.paymentMethod,cart,shippingAddress.address,navigate]);
 
-  const handleOrderSubmit = (e) => {
-    e.preventDefault();
-    console.log("Order submmit!");
+  const [createOrders, {isLoading, error}]=useCreateOrdersMutation()
+
+  const handleOrderSubmit = async() => {
+    try {
+      const res = await createOrders({
+        orderItems: cart.cartItems,
+        shippingAddress: cart.shippingAddress,
+        paymentMethod: cart.paymentMethod,
+        itemsPrice: cart.itemsPrice,
+        taxPrice: cart.taxPrice,
+        shippingPrice: cart.shippingPrice,
+        totalPrice: cart.totalPrice,
+      }).unwrap();
+      dispatch(clearCartItems());
+      navigate(`/order/${res._id}`);
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   return (
@@ -124,6 +140,13 @@ const Placeorder = () => {
                   <Col>TotalPrice:</Col>
                   <Col>${cart.totalPrice}</Col>
                 </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                {error && (
+                  <Message variant="danger">
+                    {error?.data?.message || error?.error}
+                  </Message>
+                )}
               </ListGroup.Item>
               <ListGroup.Item>
                 <Button
