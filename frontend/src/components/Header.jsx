@@ -3,6 +3,7 @@ import logo from "../logo-eshop.jpg" ;
 import { FaShoppingCart, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import ProfilePage from "../Pages/ProfilePage.jsx";
 
 
 const Header = () => {
@@ -32,10 +33,11 @@ const Header = () => {
                 </Badge>
               )}
             </Nav.Link>
-            {userInfo ? (
+            {userInfo ?
+            (
               <NavDropdown title={userInfo.name} id="username">
-                <NavDropdown.Item>Profile</NavDropdown.Item>
-                <NavDropdown.Item>Log Out</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
+                <NavDropdown.Item as={Link} >Log Out</NavDropdown.Item>
               </NavDropdown>
             ) : (
               <Nav.Link as={Link} to="/login" style={fsStyle}>

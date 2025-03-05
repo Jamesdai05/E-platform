@@ -22,7 +22,7 @@ const LoginPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const { search } = useLocation();
-  const searchPara = new URLSearchParams(search);
+  const searchPara = new URLSearchParams(search); //methods for working with URL query strings
   // retrieve the query parameter redirect and fallback value
   const redirect = searchPara.get("redirect") || "/";
 

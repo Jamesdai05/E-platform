@@ -11,7 +11,7 @@ const Loader = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-start">
       <Spinner animation="border" role="status" style={style} />
     </div>
   );
