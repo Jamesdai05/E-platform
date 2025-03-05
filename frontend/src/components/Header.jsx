@@ -1,4 +1,4 @@
-import { Container, Nav, Navbar, Badge} from "react-bootstrap";
+import { Container, Nav, Navbar, Badge, NavDropdown} from "react-bootstrap";
 import logo from "../logo-eshop.jpg" ;
 import { FaShoppingCart, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -9,7 +9,10 @@ const Header = () => {
 
   const { cartItems } = useSelector((state) => state.cart);
 
+  const {userInfo} = useSelector(state=>state.auth)
+
   const fsStyle = { color: "#fff" };
+
 
   return (
     <Navbar expand="lg" bg="dark" variant="dark">
@@ -20,10 +23,6 @@ const Header = () => {
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          {/* <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-          </Nav> */}
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/cart" style={fsStyle}>
               Cart <FaShoppingCart className="ms-0.5" />
@@ -33,9 +32,16 @@ const Header = () => {
                 </Badge>
               )}
             </Nav.Link>
-            <Nav.Link as={Link} to="/login" style={fsStyle}>
-              User <FaUser className="ms-0.5" />
-            </Nav.Link>
+            {userInfo ? (
+              <NavDropdown title={userInfo.name} id="username">
+                <NavDropdown.Item>Profile</NavDropdown.Item>
+                <NavDropdown.Item>Log Out</NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              <Nav.Link as={Link} to="/login" style={fsStyle}>
+                User <FaUser className="ms-0.5" />
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

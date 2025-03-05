@@ -1,4 +1,4 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row, ToastContainer } from "react-bootstrap";
 import FormContainer from "../components/FormContainer.jsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/Loader.jsx";
 import { setCredentials } from "../slices/authSlice.js";
 import { useLoginMutation } from "../slices/usersApiSlice.js";
+import { toast } from 'react-toastify';
+
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -39,6 +42,7 @@ const LoginPage = () => {
 
     // validate the form
     if (!email || !password) {
+      toast.error("Please fill in all fields!");
       return;
     }
 
@@ -48,6 +52,7 @@ const LoginPage = () => {
       navigate(redirect);
     } catch (err) {
       console.log(err)
+      toast.error(err?.data?.message || err?.error);
     }
 
     // console.log(email, password);
