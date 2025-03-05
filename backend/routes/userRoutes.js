@@ -9,7 +9,7 @@ import {
   logOut,
   updateUserProfile,
   getUserProfile } from '../controllers/userController.js';
-import { adminRoute, protectRoute } from '../middleware/authMiddleware.js';
+import { admin, protectRoute } from '../middleware/authMiddleware.js';
 
 
 
@@ -17,7 +17,7 @@ import { adminRoute, protectRoute } from '../middleware/authMiddleware.js';
 const router=express.Router()
 
 // fetch users and registration
-router.route("/").post(registrationOfUser).get(protectRoute,adminRoute,getUsers);
+router.route("/").post(registrationOfUser).get(protectRoute,admin,getUsers);
 
 
 // logout
@@ -30,7 +30,7 @@ router.post("/login",authUser)
 router.route("/profile").get(protectRoute,getUserProfile).put(protectRoute,updateUserProfile)
 
 // admin function
-router.route("/:id").get(protectRoute,adminRoute,getUserById).delete(protectRoute,adminRoute,deleteUserById).put(protectRoute,adminRoute,updateUserById)
+router.route("/:id").get(protectRoute,admin,getUserById).delete(protectRoute,admin,deleteUserById).put(protectRoute,admin,updateUserById)
 
 
 export default router

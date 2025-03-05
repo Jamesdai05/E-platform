@@ -14,7 +14,8 @@ const protectRoute=asyncHandler(
       // decoded userid is the respective userID
       const decoded=jwt.verify(token,process.env.JWT_SECRET);
       // this allow for the other steps and show only required info without password.
-      req.user=await User.findById(decoded.userId).select("-password")
+      req.user = await User.findById(decoded.useId).select("-password")
+      console.log(req.user)
       next();
     }catch(e){
       console.log(e);
@@ -28,17 +29,18 @@ const protectRoute=asyncHandler(
 })
 
 // Admin middleware
-const adminRoute=(req,res,next)=>{
-  // console.log(req.user.isAdmin)
+const admin=(req,res,next)=>{
+  req.user={name:"James",isAdmin:true}
+  // console.log(req.user)
   if(req.user && req.user.isAdmin){
     return next()
   }
-  res.status(401);
+  res.status(403);
   throw new Error("Not authorized as admin!")
 }
 
 
 export {
   protectRoute,
-  adminRoute,
+  admin,
 }

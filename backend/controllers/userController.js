@@ -39,7 +39,7 @@ const authUser=asyncHandler(async(req,res)=>{
 
 
 
-  res.send("Auth User!")
+  // res.send("Auth User!")
 })
 
 
