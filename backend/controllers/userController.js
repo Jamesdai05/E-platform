@@ -103,9 +103,20 @@ const logOut=asyncHandler(async(req,res)=>{
 // @access private
 
 const getUserProfile=asyncHandler(async(req,res)=>{
-  res.send("get profile!")
+  // res.send("get profile!")
+  const user=await User.findById(req.user._id);
 
+  if(user){
+    res.status(200).json({
+      _id:user._id,
+      name:user.name,
+      email:user.email,
+      isAdmin:user.isAdmin,
+    })
 
+    res.status(404)
+    throw new Error("User not found.")
+  }
 })
 
 // @desc  update user profile
@@ -113,7 +124,30 @@ const getUserProfile=asyncHandler(async(req,res)=>{
 // @access private/user self
 
 const updateUserProfile=asyncHandler(async(req,res)=>{
-  res.send("update user profile!")
+  // res.send("update user profile!")
+  const user=await User.findById(req.user._id);
+
+  if(user){
+    user.name = req.body.name || user.name;
+    user.email= req.body.email || user.email;
+
+    // if there is password in the req body
+    if(req.body.password){
+      user.password=req.body.password;
+    }
+
+    const updatedUser=await user.save();
+    // return res.json(updatedUser)
+    return res.status(200).json({
+      _id:updatedUser._id,
+      name:updatedUser.name,
+      email:updatedUser.email,
+      isAdmin:updatedUser.isAdmin,
+    })
+  }else{
+    res.status(404)
+    throw new Error("User not found")
+  }
 
 })
 
