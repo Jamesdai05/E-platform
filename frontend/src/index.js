@@ -15,6 +15,7 @@ import ProfilePage from './Pages/ProfilePage.jsx';
 import ShippingPage from './Pages/ShippingPage.jsx';
 import Payment from './Pages/Payment.jsx';
 import Placeorder from './Pages/Placeorder.jsx';
+import PrivateRoute from './Pages/PrivateRoute.jsx';
 
 
 const router=createBrowserRouter(
@@ -22,13 +23,16 @@ const router=createBrowserRouter(
     <Route path='/' element={<App />}>
       <Route index={true} path='/' element={<Home />}/>
       <Route path='/product/:id' element={<ProductDetails />}/>
-      <Route path='/cart' element={<CartPage />}/>
       <Route path='/login' element={<LoginPage />}/>
       <Route path='/register' element={<Registration />}/>
-      <Route path='/profile' element={<ProfilePage />}/>
-      <Route path='/shipping' element={<ShippingPage />}/>
-      <Route path='/payment' element={<Payment />}/>
-      <Route path='/placeorder' element={<Placeorder />}/>
+
+      <Route path="" element={<PrivateRoute />}>
+        <Route path='/profile' element={<ProfilePage />}/>
+        <Route path='/shipping' element={<ShippingPage />}/>
+        <Route path='/payment' element={<Payment />}/>
+        <Route path='/placeorder' element={<Placeorder />}/>
+        <Route path='/cart' element={<CartPage />}/>
+      </Route>
     </Route>
   )
 )
