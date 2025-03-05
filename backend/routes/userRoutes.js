@@ -17,7 +17,7 @@ import { adminRoute, protectRoute } from '../middleware/authMiddleware.js';
 const router=express.Router()
 
 // fetch users and registration
-router.route("/").post(registrationOfUser).get(getUsers);
+router.route("/").post(registrationOfUser).get(protectRoute,adminRoute,getUsers);
 
 
 // logout
@@ -30,7 +30,7 @@ router.post("/login",authUser)
 router.route("/profile").get(protectRoute,getUserProfile).put(protectRoute,updateUserProfile)
 
 // admin function
-router.route("/:id").get(getUserById).delete(deleteUserById).put(updateUserById)
+router.route("/:id").get(protectRoute,adminRoute,getUserById).delete(protectRoute,adminRoute,deleteUserById).put(protectRoute,adminRoute,updateUserById)
 
 
 export default router
