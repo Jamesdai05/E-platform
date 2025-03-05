@@ -8,7 +8,20 @@ import User from '../models/userModel.js';
 
 const authUser=asyncHandler(async(req,res)=>{
   // destructure the email and pwd
-  // const { email, password } = req.body
+  const { email, password } = req.body
+
+   const user = await User.findOne({ email });
+  // console.log(user)
+  if(user){
+     return res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
+  }
+  res.status(401)
+  throw new Error("Invalid email or password!")
 
 
 
