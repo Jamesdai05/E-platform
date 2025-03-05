@@ -13,6 +13,7 @@ const protectRoute=asyncHandler(
     try{
       // decoded userid is the respective userID
       const decoded=jwt.verify(token,process.env.JWT_SECRET);
+      console.log(decoded);
       // this allow for the other steps and show only required info without password.
       req.user = await User.findById(decoded.useId).select("-password")
       console.log(req.user)
@@ -30,7 +31,7 @@ const protectRoute=asyncHandler(
 
 // Admin middleware
 const admin=(req,res,next)=>{
-  req.user={name:"James",isAdmin:true}
+  // req.user={name:"James",isAdmin:true}
   // console.log(req.user)
   if(req.user && req.user.isAdmin){
     return next()
