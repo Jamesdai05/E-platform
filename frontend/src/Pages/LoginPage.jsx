@@ -96,7 +96,7 @@ const LoginPage = () => {
 
       <Row className="py-3">
         <Col>
-          New user ?
+          New user ?{" "}
           <Link
             className="fw-bold"
             to={redirect ? `/register?redirect=${redirect}` : "/register"}
