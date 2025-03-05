@@ -1,8 +1,9 @@
 // console.log("Hello world");
-import express from "express"
-import dotenv from "dotenv"
+import express from "express";
+import dotenv from "dotenv";
 import connectDB from "./config/dbConnect.js";
-import productRoutes from "./routes/productRoutes.js"
+import productRoutes from "./routes/productRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 dotenv.config()
 
 connectDB()
@@ -23,6 +24,7 @@ app.get("/",(req,res)=>{
 //   res.json(products)
 // })
 app.use("/api/products",productRoutes);
+app.use("/api/products",userRoutes);
 
 
 
