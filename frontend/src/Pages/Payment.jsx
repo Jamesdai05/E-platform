@@ -24,8 +24,9 @@ const Payment = () => {
 
   const handleSummit = (e) => {
     e.preventDefault();
-    console.log("payment done")
-    navigate("/placeorder")
+    // console.log("payment done")
+    dispatch(savePaymentMethod(paymentMethod));
+    navigate("/placeorder");
   };
 
   return (
