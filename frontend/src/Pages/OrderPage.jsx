@@ -3,17 +3,21 @@ import { Link, useParams } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import Loader from "../components/Loader.jsx";
 import { useSelector } from "react-redux";
-import { useGetOrderDetailsQuery, useGetPayPalClientIdQuery, usePayOrdersMutation } from "../slices/orderSlice.js";
-import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-// import { toast } from "react-toastify";
+import {
+  useGetOrderDetailsQuery,
+  useGetPayPalClientIdQuery,
+  usePayOrderMutation } from "../slices/orderSlice.js";
+// import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
 const OrderPage = () => {
   const {id:orderId}=useParams();
 
   const {data:order,refetch,isLoading,error}=useGetOrderDetailsQuery(orderId);
 
-  const [payOrder, {isLoading: loadingPay}] = usePayOrdersMutation();
+  const [payOrder, {isLoading: loadingPay}] = usePayOrderMutation();
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
@@ -24,6 +28,7 @@ const OrderPage = () => {
   }  = useGetPayPalClientIdQuery();
 
   const {userInfo}=useSelector(state=>state.auth)
+
 
   useEffect(() => {
     if (!errorPayPal && !loadingPayPal && paypal.clientId) {
@@ -38,25 +43,35 @@ const OrderPage = () => {
         });
         paypalDispatch({ type: "setLoadingStatus", value: "pending" });
       };
-      if (order && !order.isPaid) {
-        if (!window.paypal) {
-          loadPaypalScript();
-        }
-      }
+      // if (order && !order.isPaid) {
+      //   if (!window.paypal) {
+      //     loadPaypalScript();
+      //   }
+      // }
+      loadPaypalScript();
     }
   }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
-  function onApprove(){
+  const onApprove= async function(data,actions){
+    try {
+      await payOrder({ orderId, paypalPaymentId: data.orderID }).unwrap();
+      refetch(); // Refetch order details to update payment status
+      // toast.success("Payment successful!");
+    } catch (error) {
+      // toast.error(error?.data?.message || error?.error);
+    }
 
   }
 
   function onApproveTest() {}
-  function onError() {}
+  function onError(err) {
+     toast.error(err.message);
+  }
   function createOrder() {}
 
 
   const style={t0extDecoration:"none",}
-  console.log(order)
+  // console.log(order)
   return (
     <>
       {isLoading ? (
@@ -100,7 +115,7 @@ const OrderPage = () => {
                   <h2>PaymentMethod</h2>
                   <p>{order.paymentMethod}</p>
                   {order.isPaid ? (
-                    <Message variant="succes">
+                    <Message variant="success">
                       Order is paid on {order.paidAt}
                     </Message>
                   ) : (
@@ -109,7 +124,7 @@ const OrderPage = () => {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   {order.orderItems.map((item, index) => (
-                    <ListGroup.Item key={item._id}>
+                    <ListGroup.Item key={index}>
                       <Row>
                         <Col md={2}>
                           <Image src={item.image} fluid rounded />
@@ -172,13 +187,15 @@ const OrderPage = () => {
                             >
                               Test pay order
                             </Button>
-                          </div>
-                          <div>
-                            <PayPalButtons
-                              createOrder={createOrder}
-                              onApprove={onApprove}
-                              onError={onError}
-                            />
+                            <div>
+                              <PayPalScriptProvider deferLoading={true}>
+                                <PayPalButtons
+                                  createOrder={createOrder}
+                                  onApprove={onApprove}
+                                  onError={onError}
+                                />
+                              </PayPalScriptProvider>
+                            </div>
                           </div>
                         </>
                       )}

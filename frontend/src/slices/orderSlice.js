@@ -23,7 +23,7 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor:5,
     }),
-    payOrders:builder.mutation({
+    payOrder:builder.mutation({
       query:({orderId,details})=>({
         url:`${ORDERS_URL}/${orderId}/pay`,
         method:"PUT",
@@ -44,6 +44,6 @@ export const {
   useCreateOrderMutation,
   useGetOrdersQuery,
   useGetOrderDetailsQuery,
-  usePayOrdersMutation,
+  usePayOrderMutation,
   useGetPayPalClientIdQuery}=ordersApiSlice;
 
