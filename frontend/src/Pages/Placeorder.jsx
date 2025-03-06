@@ -19,9 +19,10 @@ const Placeorder = () => {
   const cart=useSelector(state=>state.cart);
   const {shippingAddress}=cart;
 
+  console.log(cart.shippingAddress.address);
+
   useEffect(() => {
     if (!cart.shippingAddress.address) {
-      console.log(cart.shippingAddress.address);
       navigate("/shipping");
     } else if (!cart.paymentMethod) {
       navigate("/payment");

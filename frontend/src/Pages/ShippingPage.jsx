@@ -26,7 +26,7 @@ const ShippingPage = () => {
   const handleSubmit=(e)=>{
     e.preventDefault();
     dispatch(saveShippingAddress({ address, city, postalCode, country }));
-    console.log(cart.shippingAddress);
+    // console.log(cart.shippingAddress);
     navigate("/payment");
   }
 
@@ -59,7 +59,7 @@ const ShippingPage = () => {
             onChange={(e) => setCity(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        <Form.Group controlId="postalcode" className="my-2">
+        <Form.Group controlId="postalCode" className="my-2">
           <Form.Label>PostalCode</Form.Label>
           <Form.Control
             type="text"
@@ -68,6 +68,8 @@ const ShippingPage = () => {
             name="postalCode"
             onChange={(e) => setPostalCode(e.target.value)}
           ></Form.Control>
+        </Form.Group>
+        <Form.Group controlId="country" className="my-2">
           <Form.Label>Country</Form.Label>
           <Form.Control
             type="text"
