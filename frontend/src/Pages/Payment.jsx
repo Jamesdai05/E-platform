@@ -15,6 +15,8 @@ const Payment = () => {
   const cart = useSelector((state) => state.cart);
   const { shippingAddress } = cart;
 
+  console.log(shippingAddress)
+
   // check the address exists or not
   useEffect(() => {
     if (!shippingAddress) {

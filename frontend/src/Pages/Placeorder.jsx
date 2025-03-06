@@ -19,10 +19,10 @@ const Placeorder = () => {
   const cart=useSelector(state=>state.cart);
   const {shippingAddress}=cart;
 
-  console.log(cart.shippingAddress.address);
+  console.log(shippingAddress.address,shippingAddress.postalCode);
 
   useEffect(() => {
-    if (!cart.shippingAddress.address) {
+    if (!shippingAddress.address) {
       navigate("/shipping");
     } else if (!cart.paymentMethod) {
       navigate("/payment");
@@ -63,12 +63,12 @@ const Placeorder = () => {
                 <strong>Address:</strong>
                 <br />
                 <i>
-                  {cart.shippingAddress.address},{cart.shippingAddress.city}
+                  {shippingAddress.address},{shippingAddress.city}
                 </i>
                 <br />
                 <i>
-                  {cart.shippingAddress.postalCode},
-                  {cart.shippingAddress.country}
+                  {shippingAddress.postalCode},
+                  {shippingAddress.country}
                 </i>
               </p>
             </ListGroup.Item>
