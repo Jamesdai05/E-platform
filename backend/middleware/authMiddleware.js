@@ -16,7 +16,7 @@ const protectRoute=asyncHandler(
       console.log(decoded);
       // this allow for the other steps and show only required info without password.
       req.user = await User.findById(decoded.useId).select("-password")
-      console.log(req.user)
+      // console.log(req.user)
       next();
     }catch(e){
       console.log(e);
