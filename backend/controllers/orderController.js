@@ -81,6 +81,23 @@ const updateOrderToDeliver=asyncHandler(async(req,res)=>{
 // @access private/Admin
 const updateOrderToPaid=asyncHandler(async(req,res)=>{
   // res.json("update order to be paid!")
+  const order=await Order.findById(req.params.id);
+  if(order){
+    order.isPaid=true;
+    order.paidAt=Date.now();
+    order.paymentResult={
+      id:req.params.id,
+      status:req.body.status,
+      update_time:req.body.update_time,
+      email_address:req.body.email_address,
+    }
+
+    const updatedOrder=await Order.save();
+    res.status(200).json(updatedOrder);
+  }else{
+    res.status(404).json("Order not found!")
+  }
+
 })
 
 
