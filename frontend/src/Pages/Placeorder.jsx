@@ -19,7 +19,7 @@ const Placeorder = () => {
   const cart=useSelector(state=>state.cart);
   const {shippingAddress}=cart;
 
-  console.log(shippingAddress.address,shippingAddress.postalCode);
+  // console.log(shippingAddress.address,shippingAddress.postalCode);
 
   useEffect(() => {
     if (!shippingAddress.address) {
