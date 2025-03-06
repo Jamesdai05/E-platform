@@ -6,7 +6,8 @@ import Message from "../components/Message.jsx";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { clearCartItems } from "../slices/cartSlice.js";
-import { useCreateOrdersMutation } from "../slices/orderSlice.js";
+import { useCreateOrderMutation } from "../slices/orderSlice.js";
+import Loader from '../components/Loader';
 
 
 
@@ -20,13 +21,14 @@ const Placeorder = () => {
 
   useEffect(() => {
     if (!cart.shippingAddress.address) {
+      console.log(cart.shippingAddress.address);
       navigate("/shipping");
     } else if (!cart.paymentMethod) {
       navigate("/payment");
     }
   }, [cart.paymentMethod,cart,shippingAddress.address,navigate]);
 
-  const [createOrders, {isLoading, error}]=useCreateOrdersMutation()
+  const [createOrders, {isLoading, error}]=useCreateOrderMutation()
 
   const handleOrderSubmit = async() => {
     try {
@@ -48,7 +50,7 @@ const Placeorder = () => {
 
   return (
     <>
-      <CheckoutComponent step1 step2 step3 />
+      <CheckoutComponent step1 step2 step3 step4 />
       <Row>
         <Col md={8}>
           <ListGroup variant="flush">
@@ -157,6 +159,7 @@ const Placeorder = () => {
                 >
                   Place Order
                 </Button>
+                {isLoading && <Loader />}
               </ListGroup.Item>
             </ListGroup>
           </Card>

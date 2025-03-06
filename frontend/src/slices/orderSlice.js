@@ -10,7 +10,7 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
       }),
     providesTags:["Products"],
     }),
-    createOrders: builder.mutation({
+    createOrder: builder.mutation({
       query: (order) => ({
         url: ORDERS_URL,
         method:"POST",
@@ -21,5 +21,5 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
 })
 
 
-export const {useCreateOrdersMutation,useGetOrdersQuery}=ordersApiSlice;
+export const {useCreateOrderMutation,useGetOrdersQuery}=ordersApiSlice;
 
