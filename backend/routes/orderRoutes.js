@@ -14,12 +14,12 @@ const router=express.Router();
 
 
 //protectRoute and check the order
-router.route("/").post(protectRoute,addOrderItems).get(protectRoute,getAllOrders);
+router.route("/").post(protectRoute,addOrderItems).get(protectRoute,admin,getAllOrders);
 // router.route("/").post(protectRoute,addOrderItems).get(getAllOrders);
 
 // check my own orders
 router.route("/mine").get(protectRoute,getMyOrders);
-router.route("/mine").get(getMyOrders);
+// router.route("/mine").get(getMyOrders);
 
 //single order route
 router.route("/:id").get(protectRoute,getOrderById)
