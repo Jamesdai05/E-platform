@@ -71,16 +71,16 @@ const getOrderById=asyncHandler(async(req,res)=>{
 // @desc   Update orders status (to complete the purchase)
 // @route  PUT api/orders/:id/:deliver
 // @access private/user
-const updateOrderById=asyncHandler(async(req,res)=>{
+const updateOrderToDeliver=asyncHandler(async(req,res)=>{
   res.json("update order")
 })
 
 
-// @desc   Update orders status (to be delivered)
-// @route  GET api/orders/:id
+// @desc   Update orders status (to be paid)
+// @route  PUT api/orders/:id/pay
 // @access private/Admin
-const updateOrderToDeliver=asyncHandler(async(req,res)=>{
-  res.json("update order")
+const updateOrderToPaid=asyncHandler(async(req,res)=>{
+  // res.json("update order to be paid!")
 })
 
 
@@ -94,7 +94,7 @@ const getAllOrders=asyncHandler(async(req,res)=>{
 
 export {
   getAllOrders,
-  updateOrderById,
+  updateOrderToPaid,
   updateOrderToDeliver,
   getOrderById,
   getMyOrders,
