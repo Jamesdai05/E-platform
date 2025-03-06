@@ -1,11 +1,11 @@
 import { Button, Card, Col, Image, ListGroup, Row } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import Loader from "../components/Loader.jsx";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useGetOrderDetailsQuery, useGetPayPalClientIdQuery, usePayOrdersMutation } from "../slices/orderSlice.js";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { useEffect } from "react";
 
 const OrderPage = () => {
