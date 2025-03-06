@@ -1,15 +1,59 @@
-import { Button, Card, Col, Form, Image, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Image, ListGroup, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import Loader from "../components/Loader.jsx";
-import { useDispatch } from "react-redux";
-import { useGetOrderDetailsQuery } from "../slices/orderSlice.js";
-
+import { useDispatch, useSelector } from "react-redux";
+import { useGetOrderDetailsQuery, useGetPayPalClientIdQuery, usePayOrdersMutation } from "../slices/orderSlice.js";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 const OrderPage = () => {
   const {id:orderId}=useParams();
 
-  const {data:order,refetch,isLoading,error}=useGetOrderDetailsQuery(orderId)
+  const {data:order,refetch,isLoading,error}=useGetOrderDetailsQuery(orderId);
+
+  const [payOrder, {isLoading: loadingPay}] = usePayOrdersMutation();
+
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+  const {
+    data:paypal,
+    isLoading: loadingPayPal,
+    error:errorPayPal,
+  }  = useGetPayPalClientIdQuery();
+
+  const {userInfo}=useSelector(state=>state.auth)
+
+  useEffect(() => {
+    if (!errorPayPal && !loadingPayPal && paypal.clientId) {
+      console.log("PayPal script loaded, rendering buttons...");
+      const loadPaypalScript = async () => {
+        paypalDispatch({
+          type: "resetOptions",
+          value: {
+            "client-id": paypal.clientId,
+            currency: "USD",
+          },
+        });
+        paypalDispatch({ type: "setLoadingStatus", value: "pending" });
+      };
+      if (order && !order.isPaid) {
+        if (!window.paypal) {
+          loadPaypalScript();
+        }
+      }
+    }
+  }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
+
+  function onApprove(){
+
+  }
+
+  function onApproveTest() {}
+  function onError() {}
+  function createOrder() {}
+
 
   const style={t0extDecoration:"none",}
   console.log(order)
@@ -114,22 +158,32 @@ const OrderPage = () => {
                       <Col>${order.totalPrice}</Col>
                     </Row>
                   </ListGroup.Item>
-                  <ListGroup.Item>
-                    {error && (
-                      <Message variant="danger">
-                        {error?.data?.message || error?.error}
-                      </Message>
-                    )}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                    >
-                      Place Order
-                    </Button>
-                    {isLoading && <Loader />}
-                  </ListGroup.Item>
+                  {!order.isPaid && (
+                    <ListGroup.Item>
+                      {isLoading && <Loader />}
+                      {isPending ? (
+                        <Loader />
+                      ) : (
+                        <>
+                          <div>
+                            <Button
+                              onClick={onApproveTest}
+                              style={{ marginBottom: "10px" }}
+                            >
+                              Test pay order
+                            </Button>
+                          </div>
+                          <div>
+                            <PayPalButtons
+                              createOrder={createOrder}
+                              onApprove={onApprove}
+                              onError={onError}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </ListGroup.Item>
+                  )}
                 </ListGroup>
               </Card>
             </Col>

@@ -17,6 +17,7 @@ import Payment from './Pages/Payment.jsx';
 import Placeorder from './Pages/Placeorder.jsx';
 import PrivateRoute from './Pages/PrivateRoute.jsx';
 import OrderPage from './Pages/OrderPage.jsx';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 
 const router=createBrowserRouter(
@@ -46,7 +47,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <PayPalScriptProvider deferLoading={true}>
+        <RouterProvider router={router} />
+      </PayPalScriptProvider>
     </Provider>
   </React.StrictMode>
 );
