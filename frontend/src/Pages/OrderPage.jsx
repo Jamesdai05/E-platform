@@ -32,7 +32,7 @@ const OrderPage = () => {
 
   useEffect(() => {
     if (!errorPayPal && !loadingPayPal && paypal.clientId) {
-      console.log("PayPal script loaded, rendering buttons...");
+      console.log("Loading PayPal script with client ID:", paypal.clientId);
       const loadPaypalScript = async () => {
         paypalDispatch({
           type: "resetOptions",
@@ -43,14 +43,39 @@ const OrderPage = () => {
         });
         paypalDispatch({ type: "setLoadingStatus", value: "pending" });
       };
-      // if (order && !order.isPaid) {
-      //   if (!window.paypal) {
-      //     loadPaypalScript();
-      //   }
-      // }
+      if (order && !order.isPaid) {
+        if (!window.paypal) {
+          loadPaypalScript();
+        }
+      }
       loadPaypalScript();
     }
   }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
+
+  // useEffect(() => {
+  //   if (
+  //     !errorPayPal &&
+  //     !loadingPayPal &&
+  //     paypal?.clientId &&
+  //     order &&
+  //     !order.isPaid
+  //   ) {
+  //     console.log("Loading PayPal script with client ID:", paypal.clientId);
+
+  //     paypalDispatch({
+  //       type: "resetOptions",
+  //       value: {
+  //         "client-id": paypal.clientId,
+  //         currency: "USD",
+  //       },
+  //     });
+
+  //     paypalDispatch({
+  //       type: "setLoadingStatus",
+  //       value: "pending",
+  //     });
+  //   }
+  // }, [paypal, loadingPayPal, errorPayPal, order, paypalDispatch]);
 
   const onApprove= async function(data,actions){
     try {
