@@ -41,6 +41,10 @@ const router=createBrowserRouter(
   )
 )
 
+// const initialOptions = {
+//     currency: "USD",
+//     intent: "capture",
+// };
 
 
 

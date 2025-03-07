@@ -10,7 +10,7 @@ import {
 // import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
 const OrderPage = () => {
   const {id:orderId}=useParams();
@@ -100,7 +100,7 @@ const OrderPage = () => {
                     <b>Address: </b>
                     {order.shippingAddress.address},{order.shippingAddress.city}
                     <br />
-                    {order.shippingAddress.coutry}{" "}
+                    {order.shippingAddress.country}{" "}
                     {order.shippingAddress.postalCode}
                   </p>
                   {order.isDelivered ? (
@@ -188,13 +188,11 @@ const OrderPage = () => {
                               Test pay order
                             </Button>
                             <div>
-                              <PayPalScriptProvider deferLoading={true}>
                                 <PayPalButtons
                                   createOrder={createOrder}
                                   onApprove={onApprove}
                                   onError={onError}
                                 />
-                              </PayPalScriptProvider>
                             </div>
                           </div>
                         </>
