@@ -52,47 +52,41 @@ const OrderPage = () => {
     }
   }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
-  // useEffect(() => {
-  //   if (
-  //     !errorPayPal &&
-  //     !loadingPayPal &&
-  //     paypal?.clientId &&
-  //     order &&
-  //     !order.isPaid
-  //   ) {
-  //     console.log("Loading PayPal script with client ID:", paypal.clientId);
 
-  //     paypalDispatch({
-  //       type: "resetOptions",
-  //       value: {
-  //         "client-id": paypal.clientId,
-  //         currency: "USD",
-  //       },
-  //     });
-
-  //     paypalDispatch({
-  //       type: "setLoadingStatus",
-  //       value: "pending",
-  //     });
-  //   }
-  // }, [paypal, loadingPayPal, errorPayPal, order, paypalDispatch]);
 
   const onApprove= async function(data,actions){
-    try {
-      await payOrder({ orderId, paypalPaymentId: data.orderID }).unwrap();
-      refetch(); // Refetch order details to update payment status
-      // toast.success("Payment successful!");
-    } catch (error) {
-      // toast.error(error?.data?.message || error?.error);
-    }
-
+    return actions.order.capture().then(async function(details){
+      try {
+        await payOrder({orderId,details});
+        refetch();
+        toast.success("Payment successful")
+      } catch (error) {
+        toast.error(error?.data?.message || error?.message)
+      }
+    })
   }
 
-  function onApproveTest() {}
+  async function onApproveTest() {
+    await payOrder({orderId,details:{payer:{}}});
+          refetch();
+          toast.success("Payment successful")
+  }
   function onError(err) {
      toast.error(err.message);
   }
-  function createOrder() {}
+  function createOrder(data,actions) {
+    return actions.order.create({
+      purchase_units:[
+        {
+          amount:{
+            value:order.totalPrice,
+          },
+        },
+      ],
+    }).then(orderId=>{
+      return orderId;
+    })
+  }
 
 
   const style={t0extDecoration:"none",}
