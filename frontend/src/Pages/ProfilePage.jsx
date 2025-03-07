@@ -135,7 +135,7 @@ const ProfilePage = () => {
                     )}
                   </td>
                   <td>
-                    <Link to={`/orders/${order._id}`}>
+                    <Link to={`/order/${order._id}`}>
                       <Button variant="secondary">Details</Button>
                     </Link>
                   </td>
