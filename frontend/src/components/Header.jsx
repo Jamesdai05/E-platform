@@ -49,16 +49,32 @@ const Header = () => {
                 </Badge>
               )}
             </Nav.Link>
-            {userInfo ?
-            (
+            {userInfo ? (
               <NavDropdown title={userInfo.name} id="username">
-                <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
-                <NavDropdown.Item as={Link} onClick={handleLogOut}>Log Out</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/profile">
+                  Profile
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} onClick={handleLogOut}>
+                  Log Out
+                </NavDropdown.Item>
               </NavDropdown>
             ) : (
               <Nav.Link as={Link} to="/login" style={fsStyle}>
                 User <FaUser className="ms-0.5" />
               </Nav.Link>
+            )}
+            {userInfo && userInfo.isAdmin && (
+              <NavDropdown title="Admin" id="adminmenu">
+                <NavDropdown.Item as={Link} to="/admin/productList">
+                  UserList
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/admin/orderList">
+                  OrderList
+                </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/admin/userList">
+                  UserList
+                </NavDropdown.Item>
+              </NavDropdown>
             )}
           </Nav>
         </Navbar.Collapse>

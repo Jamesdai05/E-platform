@@ -15,9 +15,11 @@ import ProfilePage from './Pages/ProfilePage.jsx';
 import ShippingPage from './Pages/ShippingPage.jsx';
 import Payment from './Pages/Payment.jsx';
 import Placeorder from './Pages/Placeorder.jsx';
-import PrivateRoute from './Pages/PrivateRoute.jsx';
+import PrivateRoute from './components/PrivateRoute.jsx';
 import OrderPage from './Pages/OrderPage.jsx';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import AdminRoute from './components/AdminRoute.jsx';
+import Orderlist from './Pages/Admin/Orderlist.jsx';
 
 
 
@@ -37,6 +39,10 @@ const router=createBrowserRouter(
         <Route path='/placeorder' element={<Placeorder />}/>
         <Route path='/cart' element={<CartPage />}/>
         <Route path='/order/:id' element={<OrderPage />}/>
+      </Route>
+
+      <Route path="/" element={<AdminRoute/>}>
+        <Route path="/admin/orderlist" element={<Orderlist />}></Route>
       </Route>
     </Route>
   )
