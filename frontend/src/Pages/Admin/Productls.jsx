@@ -24,7 +24,7 @@ const Productls = () => {
       try {
         await createProduct();
         refetch();
-        toast.success("Product is created.");
+        toast.success("Template Product is created.");
       } catch (error) {
         toast.error(error?.data?.message || error?.error);
       }
