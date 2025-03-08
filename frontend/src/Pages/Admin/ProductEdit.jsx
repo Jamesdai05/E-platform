@@ -37,12 +37,35 @@ const ProductEdit = () => {
       setBrand(product.brand);
       setCountInStock(product.countInStock);
       setDescription(product.description);
-      setDescription(product.image);
+      setImage(product.image);
     }
   },[product])
 
 
   // console.log(product);
+
+  const handleUpdate=async(e)=>{
+    e.preventDefault();
+    // console.log("Update");
+    const updatedProduct={
+      productId,
+      name,
+      brand,
+      category,
+      price,
+      countInStock,
+      description,
+      image,
+    };
+
+    const result=await updateProduct(updatedProduct);
+    if(result.err){
+      toast.error(result.err);
+    }else{
+      toast.success("Product updated successfully.");
+      navigate("/admin/productlist");
+    }
+  }
 
 
   return (
@@ -62,7 +85,7 @@ const ProductEdit = () => {
             {error?.data?.message || error?.error}
           </Message>
         ) : (
-          <Form>
+          <Form onSubmit={handleUpdate}>
             <Form.Group controlId="name" className="my-2">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -139,6 +162,10 @@ const ProductEdit = () => {
                 onChange={(e) => setImage(e.target.value)}
               />
             </Form.Group>
+            <h6>Image uploading tool will be settle later.</h6>
+            <Button className="my-2" type="submit">
+              Update Product
+            </Button>
           </Form>
         )}
       </FormContainer>
