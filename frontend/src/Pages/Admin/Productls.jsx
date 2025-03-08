@@ -72,7 +72,7 @@ const Productls = () => {
                 <td>${p.price}</td>
                 <td>{p.countInStock}</td>
                 <td>
-                  <Link to={`/admin/product/${p._id}`}>
+                  <Link to={`/admin/product/${p._id}/edit`}>
                     <Button variant="light" className="btn-sm mx-2">
                       <FaEdit />
                     </Button>
