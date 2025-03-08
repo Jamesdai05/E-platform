@@ -3,7 +3,7 @@ import Message from "../../components/Message.jsx";
 import Loader from "../../components/Loader.jsx";
 import { useGetProductsQuery } from "../../slices/productsSlice.js";
 import { FaEdit } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 
 
 
@@ -39,19 +39,29 @@ const Productls = () => {
               <th>Brand</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Stock</th>
               <th></th>
             </tr>
           </thead>
-          {products.map((p) => (
-            <tr key={p._id}>
-              <td>{p._id}</td>
-              <td>{p.name}</td>
-              <td>{p.brand}</td>
-              <td>{p.category}</td>
-              <td>${p.price}</td>
-              <td></td>
-            </tr>
-          ))}
+          <tbody>
+            {products.map((p) => (
+              <tr key={p._id}>
+                <td>{p._id}</td>
+                <td>{p.name}</td>
+                <td>{p.brand}</td>
+                <td>{p.category}</td>
+                <td>${p.price}</td>
+                <td>{p.countInStock}</td>
+                <td>
+                  <Link to={`/admin/product/${p._id}`}>
+                    <Button variant="light" className="btn-sm mx-2">
+                      <FaEdit />
+                    </Button>
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       )}
     </>
