@@ -72,7 +72,16 @@ const getOrderById=asyncHandler(async(req,res)=>{
 // @route  PUT api/orders/:id/:deliver
 // @access private/user
 const updateOrderToDeliver=asyncHandler(async(req,res)=>{
-  res.json("update order")
+  const order=await Order.findById(req.params.id)
+  if(order){
+    order.isDelivered=true;
+    order.deliveredAt=Date.now();
+
+    const updatedOrder=await order.save();
+    res.status(200).json(updatedOrder);
+  }else{
+    res.status(400).json("Order not exist!")
+  }
 })
 
 

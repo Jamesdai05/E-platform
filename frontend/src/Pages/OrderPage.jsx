@@ -91,8 +91,14 @@ const OrderPage = () => {
     })
   }
 
-  const handleDeliver=()=>{
-    console.log("Deliver!")
+  const handleDeliver=async()=>{
+    try {
+      await deliverOrder(orderId);
+      refetch();
+      toast.success("Order is delivered!")
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message);
+    }
   }
 
 
@@ -130,7 +136,7 @@ const OrderPage = () => {
                     {order.shippingAddress.postalCode}
                   </p>
                   {order.isDelivered ? (
-                    <Message variant="succes">
+                    <Message variant="success">
                       Order is delivered on {order.deliveredAt}
                     </Message>
                   ) : (
@@ -225,7 +231,7 @@ const OrderPage = () => {
                       )}
                     </ListGroup.Item>
                   )}
-                  {isLoading && <Loader/>}
+                  {loadingDeliver && <Loader/>}
                   {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                     <ListGroup.Item>
                       <Button className="btn btn-block" type="button" onClick={handleDeliver}>Mark as Delivered</Button>
