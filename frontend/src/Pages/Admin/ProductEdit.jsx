@@ -29,8 +29,38 @@ const ProductEdit = () => {
 
   const navigate=useNavigate();
 
-  useEffect(()=>{
-    if(product){
+
+
+
+  // console.log(product);
+
+  const handleUpdate=async(e)=>{
+    e.preventDefault();
+    // console.log("Update");
+
+    try {
+      const updatedProduct = {
+        productId,
+        name,
+        brand,
+        category,
+        price,
+        countInStock,
+        description,
+        image,
+      };
+
+      await updateProduct(updatedProduct).unwrap();
+      toast.success("Product updated successfully.");
+      refetch();
+      navigate("/admin/productlist");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error)
+    }
+  }
+
+  useEffect(() => {
+    if (product) {
       setName(product.name);
       setPrice(product.price);
       setCategory(product.category);
@@ -39,33 +69,7 @@ const ProductEdit = () => {
       setDescription(product.description);
       setImage(product.image);
     }
-  },[product])
-
-
-  // console.log(product);
-
-  const handleUpdate=async(e)=>{
-    e.preventDefault();
-    // console.log("Update");
-    const updatedProduct={
-      productId,
-      name,
-      brand,
-      category,
-      price,
-      countInStock,
-      description,
-      image,
-    };
-
-    const result=await updateProduct(updatedProduct);
-    if(result.err){
-      toast.error(result.err);
-    }else{
-      toast.success("Product updated successfully.");
-      navigate("/admin/productlist");
-    }
-  }
+  }, [product]);
 
 
   return (

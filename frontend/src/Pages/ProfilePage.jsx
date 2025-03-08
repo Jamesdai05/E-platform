@@ -37,7 +37,12 @@ const ProfilePage = () => {
       toast.error("Passwords do not match!")
     }else{
       try {
-        const res=await updateProfile({_id:userInfo._id, name,email,password}).unwrap();
+        const res=await updateProfile({
+          // _id:userInfo._id,
+          // above is not needed as it is not in the controller.
+          name,
+          email,
+          password}).unwrap();
         // to update the credentials
         dispatch(setCredentials(res))
         toast.success("Profile updated successfully.")
