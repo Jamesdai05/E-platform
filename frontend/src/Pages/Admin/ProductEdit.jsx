@@ -81,7 +81,7 @@ const ProductEdit = () => {
                 placeholder="Enter product price"
                 value={price}
                 name="price"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setPrice(e.target.value)}
               />
             </Form.Group>
 
@@ -92,7 +92,7 @@ const ProductEdit = () => {
                 placeholder="Enter the category"
                 value={category}
                 name="category"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setCategory(e.target.value)}
               />
             </Form.Group>
 
@@ -103,7 +103,7 @@ const ProductEdit = () => {
                 placeholder="Enter product brand"
                 value={brand}
                 name="brand"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setBrand(e.target.value)}
               />
             </Form.Group>
 
@@ -112,9 +112,9 @@ const ProductEdit = () => {
               <Form.Control
                 type="text"
                 placeholder="Enter the stock"
-                value={stock}
+                value={countInStock}
                 name="stock"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setCountInStock(e.target.value)}
               />
             </Form.Group>
 
@@ -125,7 +125,7 @@ const ProductEdit = () => {
                 placeholder="Enter the description"
                 value={description}
                 name="description"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </Form.Group>
 
@@ -136,7 +136,7 @@ const ProductEdit = () => {
                 placeholder="Enter product name"
                 value={image}
                 name="image"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setImage(e.target.value)}
               />
             </Form.Group>
           </Form>
