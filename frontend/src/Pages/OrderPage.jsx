@@ -1,4 +1,4 @@
-import { Button, Card, Col, Image, ListGroup, ListGroupItem, Row } from "react-bootstrap";
+import { Button, Card, Col, Image, ListGroup, Row } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import Loader from "../components/Loader.jsx";
