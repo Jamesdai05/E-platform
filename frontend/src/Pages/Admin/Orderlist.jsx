@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 const Orderlist = () => {
 
   const{data:orders, isLoading,error}=useGetallordersQuery();
-  console.log(orders)
+  // console.log(orders)
   return (
     <>
       <h1>Order list</h1>

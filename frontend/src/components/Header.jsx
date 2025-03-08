@@ -64,11 +64,10 @@ const Header = () => {
               </Nav.Link>
             )}
 
-
             {userInfo && userInfo.isAdmin && (
               <NavDropdown title="Admin" id="adminmenu">
                 <NavDropdown.Item as={Link} to="/admin/productList">
-                  UserList
+                  Productlist
                 </NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/admin/orderList">
                   OrderList

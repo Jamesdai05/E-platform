@@ -3,4 +3,4 @@ const Userlist = () => {
     <div>Userlist</div>
   )
 }
-export default Userlist
+export default Userlist;
