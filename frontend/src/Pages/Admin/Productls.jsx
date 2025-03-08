@@ -2,7 +2,7 @@ import { Col, Row,Button,Table } from "react-bootstrap";
 import Message from "../../components/Message.jsx";
 import Loader from "../../components/Loader.jsx";
 import { useGetProductsQuery } from "../../slices/productsSlice.js";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 
@@ -12,7 +12,9 @@ const Productls = () => {
 
   const {data:products, isLoading,error}=useGetProductsQuery();
 
-
+  const handleDelete=(id)=>{
+    console.log("delete",id)
+  }
 
   return (
     <>
@@ -58,6 +60,11 @@ const Productls = () => {
                       <FaEdit />
                     </Button>
                   </Link>
+                </td>
+                <td>
+                  <Button variant="danger" className="btn-sm mx-2" onClick={()=>handleDelete(p._id)}>
+                      <FaTrash />
+                  </Button>
                 </td>
               </tr>
             ))}
