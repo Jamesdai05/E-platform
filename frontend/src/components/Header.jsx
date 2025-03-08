@@ -63,6 +63,8 @@ const Header = () => {
                 User <FaUser className="ms-0.5" />
               </Nav.Link>
             )}
+
+
             {userInfo && userInfo.isAdmin && (
               <NavDropdown title="Admin" id="adminmenu">
                 <NavDropdown.Item as={Link} to="/admin/productList">
