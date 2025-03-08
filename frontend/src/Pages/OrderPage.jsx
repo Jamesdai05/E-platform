@@ -1,4 +1,4 @@
-import { Button, Card, Col, Image, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Image, ListGroup, ListGroupItem, Row } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import Message from "../components/Message.jsx";
 import Loader from "../components/Loader.jsx";
@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import {
   useGetOrderDetailsQuery,
   useGetPayPalClientIdQuery,
-  usePayOrderMutation } from "../slices/orderSlice.js";
+  usePayOrderMutation,
+  useDeliveredorderMutation } from "../slices/orderSlice.js";
 // import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -18,6 +19,8 @@ const OrderPage = () => {
   const {data:order,refetch,isLoading,error}=useGetOrderDetailsQuery(orderId);
 
   const [payOrder, {isLoading: loadingPay}] = usePayOrderMutation();
+
+  const [deliverOrder, {isLoading: loadingDeliver }] =useDeliveredorderMutation();
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
@@ -88,8 +91,12 @@ const OrderPage = () => {
     })
   }
 
+  const handleDeliver=()=>{
+    console.log("Deliver!")
+  }
 
-  const style={t0extDecoration:"none",}
+
+  const style={textDecoration:"none",}
   // console.log(order)
   return (
     <>
@@ -218,6 +225,12 @@ const OrderPage = () => {
                       )}
                     </ListGroup.Item>
                   )}
+                  {isLoading && <Loader/>}
+                  {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                    <ListGroup.Item>
+                      <Button className="btn btn-block" type="button" onClick={handleDeliver}>Mark as Delivered</Button>
+                    </ListGroup.Item>
+                  ) }
                 </ListGroup>
               </Card>
             </Col>
