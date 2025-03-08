@@ -51,8 +51,10 @@ const ProductEdit = () => {
       </Link>
 
       <FormContainer>
+        <h1>Update Product</h1>
+        {loadingUpdate && <Loader />}
 
-        
+        {isLoading ? <Loader /> : error ? <Message variant="danger">{error?.data?.message || error?.error}</Message> : (<h1>Update</h1>)}
       </FormContainer>
 
     </>
