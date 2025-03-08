@@ -22,6 +22,7 @@ import AdminRoute from './components/AdminRoute.jsx';
 import Orderlist from './Pages/Admin/Orderlist.jsx';
 import Userlist from './Pages/Admin/Userlist.jsx';
 import Productls from './Pages/Admin/Productls.jsx';
+import ProductEdit from './Pages/Admin/ProductEdit.jsx';
 
 
 
@@ -44,9 +45,10 @@ const router=createBrowserRouter(
       </Route>
 
       <Route path="/" element={<AdminRoute/>}>
-        <Route path="/admin/orderlist" element={<Orderlist />}></Route>
-        <Route path="/admin/productlist" element={<Productls />}></Route>
-        <Route path="/admin/userlist" element={<Userlist />}></Route>
+        <Route path="/admin/orderlist" element={<Orderlist />} />
+        <Route path="/admin/productlist" element={<Productls />} />
+        <Route path="/admin/userlist" element={<Userlist />} />
+        <Route path="/admin/productedit" element={<ProductEdit />} />
       </Route>
     </Route>
   )
