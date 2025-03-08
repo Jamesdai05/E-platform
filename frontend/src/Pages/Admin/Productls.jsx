@@ -1,31 +1,48 @@
-import { Col, Row,Button,Table } from "react-bootstrap";
+import { Col, Row, Button, Table } from "react-bootstrap";
 import Message from "../../components/Message.jsx";
 import Loader from "../../components/Loader.jsx";
-import { useGetProductsQuery } from "../../slices/productsSlice.js";
+import {
+  useCreateProductMutation,
+  useGetProductsQuery,
+} from "../../slices/productsSlice.js";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
-
-
+import { toast } from "react-toastify";
 
 const Productls = () => {
+  const { data: products, refetch, isLoading, error } = useGetProductsQuery();
 
-  const {data:products, isLoading,error}=useGetProductsQuery();
+  const [createProduct, { isLoading: loadingCreate }] =
+    useCreateProductMutation();
 
-  const handleDelete=(id)=>{
-    console.log("delete",id)
-  }
+  const handleDelete = (id) => {
+    console.log("delete", id);
+  };
+
+  const handleCreate = async () => {
+    if (window.confirm("Are you sure you want to create a product?")) {
+      try {
+        await createProduct();
+        refetch();
+        toast.success("Product is created.");
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error);
+      }
+    }
+  };
 
   return (
     <>
       <Row className="align-items-center">
         <Col>Products</Col>
         <Col className="text-end">
-          <Button type="button" className="btn-sm m-3">
+          <Button type="button" className="btn-sm m-3" onClick={handleCreate}>
             Create Product <FaEdit />
           </Button>
         </Col>
       </Row>
+
+      {loadingCreate && <Loader />}
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -62,8 +79,12 @@ const Productls = () => {
                   </Link>
                 </td>
                 <td>
-                  <Button variant="danger" className="btn-sm mx-2" onClick={()=>handleDelete(p._id)}>
-                      <FaTrash />
+                  <Button
+                    variant="danger"
+                    className="btn-sm mx-2"
+                    onClick={() => handleDelete(p._id)}
+                  >
+                    <FaTrash />
                   </Button>
                 </td>
               </tr>
@@ -73,5 +94,5 @@ const Productls = () => {
       )}
     </>
   );
-}
-export default Productls
+};
+export default Productls;
