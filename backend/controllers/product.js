@@ -27,6 +27,7 @@ const getProductsById=asyncHandler(async(req,res)=>{
 // @access private/admin
 
 const createProduct=asyncHandler(async(req,res)=>{
+  // this just to create a mock product and modify from the frontend.
   const product = new Product ({
     name:"Product",
     price:0,
