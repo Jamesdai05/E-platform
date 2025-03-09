@@ -51,7 +51,7 @@ const ProductEdit = () => {
     const result=await updateProduct(updatedProduct);
     if(!result.error){
       toast.success("Product is upadted!");
-      navigate("admin/productlist");
+      navigate("/admin/productList");
     }else{
       toast.error(result.error);
     }
@@ -73,7 +73,7 @@ const ProductEdit = () => {
 
   return (
     <>
-      <Link to="/admin/productlist" className="btn btn-primary m-3">
+      <Link to="/admin/productList" className="btn btn-primary m-3">
         Go Back
       </Link>
 
