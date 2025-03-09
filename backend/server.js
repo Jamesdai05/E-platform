@@ -1,4 +1,5 @@
 // console.log("Hello world");
+import path from 'path';
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/dbConnect.js";
@@ -9,6 +10,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+
 
 dotenv.config()
 
@@ -50,8 +52,12 @@ app.get("/api/config/paypal",(req,res)=>
   res.send({cliendId: process.env.PAYPAL_CLIENT_ID})
 );
 
+const __dirname=path.resolve();// set __dirname to current directory
+app.use("/uploads",express.static(path.join(__dirname,"/uploads")))
+
 app.use(notFound);
 app.use(errorHandler);
+
 
 
 

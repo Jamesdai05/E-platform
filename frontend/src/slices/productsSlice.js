@@ -31,6 +31,11 @@ export const productsApiSlice=apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Product'],
     }),
+    uploadProductimage:builder.mutation({
+      query:(data)=>({
+        url:`${PRODUCTS_URL}/${data.productId}`
+      })
+    })
   }),
 });
 
