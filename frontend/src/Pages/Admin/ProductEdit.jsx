@@ -7,7 +7,8 @@ import FormContainer from "../../components/FormContainer.jsx";
 import { toast } from "react-toastify";
 import {
   useGetProductDetailsQuery,
-  useUpdateProductMutation } from "../../slices/productsSlice.js";
+  useUpdateProductMutation,
+useUploadProductImageMutation } from "../../slices/productsSlice.js";
 
 
 
@@ -26,11 +27,9 @@ const ProductEdit = () => {
   const {data:product,isLoading,refetch,error}=useGetProductDetailsQuery(productId);
 
   const [ updateProduct,{isLoading : loadingUpdate}] = useUpdateProductMutation();
+  const [uploadProductImage,{isloading:loadingImage}] = useUploadProductImageMutation();
 
   const navigate=useNavigate();
-
-
-
 
   // console.log(product);
 
@@ -65,6 +64,21 @@ const ProductEdit = () => {
     //   toast.error(result.error);
     // }
 
+  }
+
+  const handleUpload=async(e)=>{
+    console.log("upload!")
+    // to check the data get in the frontend
+    // console.log(e.target.files[0])
+    const formData=new FormData();
+    formData.append("image",e.target.files[0])
+    try {
+      const res= await uploadProductImage(formData).unwrap();
+      toast.success(res.message);
+      setImage(res.image);
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
   }
 
   useEffect(() => {
@@ -168,11 +182,12 @@ const ProductEdit = () => {
               <Form.Label>Image</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter product name"
+                placeholder="Enter image url"
                 value={image}
                 name="image"
                 onChange={(e) => setImage(e.target.value)}
               />
+              <Form.Control type="file" label="Choose file to upload" onChange={handleUpload}></Form.Control>
             </Form.Group>
             <h6>Image uploading tool will be settle later.</h6>
             <Button className="my-2" type="submit">

@@ -67,6 +67,7 @@ const updateProductsById=asyncHandler(async(req,res)=>{
     product.countInStock=countInStock;
     product.category=category;
     product.description=description;
+    product.image=image;
 
     const updateProduct=await product.save();
     return res.status(201).json(updateProduct);
