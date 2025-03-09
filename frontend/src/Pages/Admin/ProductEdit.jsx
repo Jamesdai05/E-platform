@@ -37,9 +37,7 @@ const ProductEdit = () => {
   const handleUpdate=async(e)=>{
     e.preventDefault();
     // console.log("Update");
-
-    try {
-      const updatedProduct = {
+    const updatedProduct = {
         productId,
         name,
         brand,
@@ -50,13 +48,14 @@ const ProductEdit = () => {
         image,
       };
 
-      await updateProduct(updatedProduct).unwrap();
-      toast.success("Product updated successfully.");
-      refetch();
-      navigate("/admin/productlist");
-    } catch (error) {
-      toast.error(error?.data?.message || error?.error)
+    const result=await updateProduct(updatedProduct);
+    if(!result.error){
+      toast.success("Product is upadted!");
+      navigate("admin/productlist");
+    }else{
+      toast.error(result.error);
     }
+
   }
 
   useEffect(() => {

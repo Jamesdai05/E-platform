@@ -26,7 +26,7 @@ export const productsApiSlice=apiSlice.injectEndpoints({
     updateProduct:builder.mutation({
       query:(data)=>({
         url:`${PRODUCTS_URL}/${data.productId}`,
-        method:"POST",
+        method:"PUT",
         body:data,
       }),
       invalidatesTags: ['Product'],
