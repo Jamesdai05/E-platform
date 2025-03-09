@@ -48,13 +48,22 @@ const ProductEdit = () => {
         image,
       };
 
-    const result=await updateProduct(updatedProduct);
-    if(!result.error){
-      toast.success("Product is upadted!");
-      navigate("/admin/productList");
-    }else{
-      toast.error(result.error);
-    }
+      try {
+        await updateProduct(updatedProduct).unwrap();
+        refetch();
+        toast.success("Product is updated!");
+        navigate("/admin/productList");
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error);
+      }
+
+    // const result=await updateProduct(updatedProduct);
+    // if(!result.error){
+    //   toast.success("Product is upadted!");
+    //   navigate("/admin/productList");
+    // }else{
+    //   toast.error(result.error);
+    // }
 
   }
 
