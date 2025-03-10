@@ -50,6 +50,9 @@ const Userlist = () => {
                       <FaEdit />
                     </Button>
                   </Link>
+                  <Button variant="danger" className="btn-sm mx-2">
+                    <FaTrash style={{color:"white"}}/>
+                  </Button>
                 </td>
               </tr>
             ))}
