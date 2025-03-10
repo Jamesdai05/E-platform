@@ -6,6 +6,7 @@ import { useGetProductsQuery } from "../slices/productsSlice.js";
 // import axios from 'axios';
 import Message from "../components/Message.jsx";
 import { useParams } from "react-router-dom";
+import Paginate from "../components/Paginate.jsx";
 
 
 
@@ -25,7 +26,7 @@ const Home = () => {
 
   // const { data: products, isLoading, error } = useGetProductsQuery();
   const { data, isLoading, error } = useGetProductsQuery({pageNumber});
-  console.log(data)
+  // console.log(data)
   const style = {
     display: "flex",
     justifyContent: "center",
@@ -42,6 +43,7 @@ const Home = () => {
         <>
           <h1>Latest Products</h1>
           <Productlist products={data.products} style={style} />
+          <Paginate pages={data.pages} page={data.page} />
         </>
       )}
     </>

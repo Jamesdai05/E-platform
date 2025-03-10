@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const Paginate = ({pages,page,isAdmin=false}) => {
   // to set the admin for the prodctlist for future development.
   return (
-    {pages}>1 && (
+    pages>1 && (
     <Pagination>
       {[...Array(pages).keys()].map(p=>(
         <Link
@@ -14,7 +14,6 @@ const Paginate = ({pages,page,isAdmin=false}) => {
           <Pagination.Item active={p+1===page}>{p+1}</Pagination.Item>
         </Link>
       ))}
-
     </Pagination>)
   )
 }
