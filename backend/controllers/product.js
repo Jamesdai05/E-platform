@@ -115,7 +115,7 @@ const createProductReview=asyncHandler(async(req,res)=>{
       }
       const review ={
         name:req.user.name,
-        rating:Number(product.rating),
+        rating:Number(rating),
         comment,
         user:req.user._id,
       };
