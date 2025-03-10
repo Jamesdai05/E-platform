@@ -6,8 +6,11 @@ console.log(UPLOAD_URL)
 export const productsApiSlice=apiSlice.injectEndpoints({
   endpoints:(builder)=>({
     getProducts:builder.query({
-      query:()=>({
+      query:({pageNumber})=>({
         url:PRODUCTS_URL,
+        params:{
+          pageNumber,
+        }
       }),
       keepUnusedDataFor:5,
       providesTags: ['Product'],

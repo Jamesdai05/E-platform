@@ -5,11 +5,12 @@ import { useGetProductsQuery } from "../slices/productsSlice.js";
 // import products from "../products";
 // import axios from 'axios';
 import Message from "../components/Message.jsx";
+import { useParams } from "react-router-dom";
 
 
 
 const Home = () => {
-
+    const {pageNumber}=useParams();
   // const [products,setProducts]=useState([])
   // const productsUrl="api/products"
 
@@ -23,7 +24,7 @@ const Home = () => {
   // },[])
 
   // const { data: products, isLoading, error } = useGetProductsQuery();
-  const { data, isLoading, error } = useGetProductsQuery();
+  const { data, isLoading, error } = useGetProductsQuery({pageNumber});
   console.log(data)
   const style = {
     display: "flex",

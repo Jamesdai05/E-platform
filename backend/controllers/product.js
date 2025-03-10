@@ -12,12 +12,12 @@ const getProducts=asyncHandler(async(req,res)=>{
 
 
 const getProductsWithPagination=asyncHandler(async(req,res)=>{
-  const pageSize=2;
-  const page = Number(req.query.pagNumber) || 1; //the page number will be query number or the default 1.
+  const pageSize=8;
+  const page = Number(req.query.pageNumber) || 1; //the page number will be query number or the default 1.
 
   const count=await Product.countDocuments(); //for mongodb database
 
-  const products=await Product.find({}).limit(pageSize).skip(pageSize-1);
+  const products=await Product.find({}).limit(pageSize).skip(pageSize *(page-1));
 
   res.json({products,page,pages:Math.ceil(count / pageSize)});
 })
