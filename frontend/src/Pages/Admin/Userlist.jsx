@@ -68,7 +68,7 @@ const Userlist = () => {
                       <FaEdit />
                     </Button>
                   </Link>
-                  <Button variant="danger" className="btn-sm mx-2" onClick={handleDelete}>
+                  <Button variant="danger" className="btn-sm mx-2" onClick={()=>handleDelete(user._id)}>
                     <FaTrash style={{color:"white"}}/>
                   </Button>
                 </td>
