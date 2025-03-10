@@ -21,9 +21,25 @@ const UserEdit = () => {
   const {data:user, refetch,isLoading, error}=useGetUserDetailsQuery(userId);
 
   const [updateUser,{isLoading:loadingUpdateUser}] =useUpdateUserMutation();
+  console.log(user);
+  const handleUpdate=async(e)=>{
+    e.preventDefault();
+    // console.log("Update");
 
-  const handleUpdate=()=>{
-    console.log("Update");
+    const updatedUser={
+      userId,
+      name,
+      email,
+      isAdmin,
+    };
+    try {
+      await updateUser(updatedUser).unwrap();
+      refetch();
+      toast.success("User is updated!");
+      navigate("/admin/userlist");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
   }
 
   useEffect(()=>{
@@ -76,18 +92,13 @@ const UserEdit = () => {
             </Form.Group>
 
             <Form.Group controlId="isAdmin" className="my-2">
-              <Form.Label>isAdmin</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter the category"
-                value={isAdmin}
-                name="category"
-                onChange={(e) => setIsAdmin(e.target.value)}
+              <Form.Check
+                type="checkbox"
+                label="Is Admin"
+                checked={isAdmin}
+                onChange={(e) => setIsAdmin(e.target.checked)}
               />
             </Form.Group>
-
-            {/* <h6>Image uploading tool will be settle later.</h6> */}
-
             <Button className="my-2" type="submit">
               Update User
             </Button>
