@@ -29,8 +29,15 @@ export const usersApiSlice=apiSlice.injectEndpoints({
         url:`${USERS_URL}/profile`,
         method:"PUT",
         body:data,
-      })
-    })
+      }),
+    }),
+    getusers:builder.query({
+      query:()=>({
+        url: USERS_URL,
+        method:"GET",
+      }),
+      providesTags: ['USERS'],
+    }),
   })
 });
 

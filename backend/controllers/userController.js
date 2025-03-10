@@ -158,7 +158,7 @@ const updateUserProfile=asyncHandler(async(req,res)=>{
 
 const getUsers=asyncHandler(async(req,res)=>{
   const users=await User.find({})
-  res.json(users)
+  res.status(200).json(users)
   // res.send("get users!")
 })
 
@@ -168,15 +168,32 @@ const getUsers=asyncHandler(async(req,res)=>{
 // @access private/Admin
 
 const getUserById=asyncHandler(async(req,res)=>{
-  res.send("Get user")
-})
+  // res.send("Get user")
+  const user=await User.findById(req.params.id).select("-password");
+
+  if(user){
+    return res.status(200).json(user);
+  }else{
+    res.status(404).json("User not exist!");
+  };
+});
 
 // @desc  Delete user
 // @route GET /api/users/:id
 // @access private/Admin
 
 const deleteUserById=asyncHandler(async(req,res)=>{
-  res.send("delete user")
+  // res.send("delete user")
+  const user = await User.findById(req.params.id);
+  if(user){
+    if(user.isAdmin){
+      res.status(400).json("Cannot delete admin!")
+    }
+    await User.deleteOne({_id:user._id});
+    return res.status(200).json({message:"User is deleted successfully!"})
+  }else{
+    res.status(404).json("User not exist!");
+  }
 })
 
 
@@ -185,7 +202,18 @@ const deleteUserById=asyncHandler(async(req,res)=>{
 // @access private/Admin
 
 const updateUserById=asyncHandler(async(req,res)=>{
-  res.send("update user")
+  // res.send("update user")
+  const user=await User.findById(req.params.id);
+  if(user){
+    user.name =req.body.name || user.name;
+    user.email =req.body.email || user.email;
+    user.isAdmin = Boolean(req.body.isAdmin)
+
+    const updatedUser = await user.save();
+    return res.status(201).json(updatedUser).select("-password");
+  }else{
+    res.status(404).json("User not exist!");
+  }
 })
 
 
