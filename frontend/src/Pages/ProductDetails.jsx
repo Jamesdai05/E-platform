@@ -191,10 +191,10 @@ const ProductDetails = () => {
                         >
                           <option value="">Please make a review</option>
                           <option value="1">1 - Poor</option>
-                          <option value="1">2 - Fair</option>
-                          <option value="1">3 - Good</option>
-                          <option value="1">4 - VeryGood</option>
-                          <option value="1">5 - Excellent</option>
+                          <option value="2">2 - Fair</option>
+                          <option value="3">3 - Good</option>
+                          <option value="4">4 - VeryGood</option>
+                          <option value="5">5 - Excellent</option>
                         </Form.Control>
                       </Form.Group>
                       <Form.Group>
