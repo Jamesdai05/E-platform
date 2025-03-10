@@ -1,18 +1,36 @@
-import { Table, Button } from "react-bootstrap";
+import { Table, Button,} from "react-bootstrap";
 import { FaTimes, FaTrash, FaCheck, FaEdit } from "react-icons/fa";
 import Loader from "../../components/Loader.jsx";
 import Message from "../../components/Message.jsx";
-import { useGetUsersQuery } from "../../slices/usersApiSlice.js";
+import { useDeleteUserMutation, useGetUsersQuery } from "../../slices/usersApiSlice.js";
 import { Link } from "react-router-dom";
-
+import { toast } from "react-toastify";
 
 const Userlist = () => {
 
   const { data: users, refetch, isLoading, error } = useGetUsersQuery();
-  console.log(users)
+  // console.log(users)
+
+
+  const [deleteUser, {isLoading: loadingDelete}] =useDeleteUserMutation();
+
+  const handleDelete=async(id)=>{
+    // console.log("handle Deleting")
+    if(window.confirm("Are you sure want to delete the user?")){
+      try {
+        await deleteUser(id);
+        refetch();
+        toast.success("User is deleted!")
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error);
+      }
+    }
+  }
+
   return (
     <>
       <h1>Userlist</h1>
+      {loadingDelete && <Loader />}
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -50,7 +68,7 @@ const Userlist = () => {
                       <FaEdit />
                     </Button>
                   </Link>
-                  <Button variant="danger" className="btn-sm mx-2">
+                  <Button variant="danger" className="btn-sm mx-2" onClick={handleDelete}>
                     <FaTrash style={{color:"white"}}/>
                   </Button>
                 </td>
