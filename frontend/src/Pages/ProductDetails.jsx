@@ -21,6 +21,9 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [rating,setRating]=useState(0);
+  const [comment,setComment]=useState("");
+
 
 
   const {
@@ -39,6 +42,11 @@ const ProductDetails = () => {
     // navigate to cart page
     navigate("/cart");
   };
+
+  const handleReviewSubmit=(e)=>{
+    e.preventDefault();
+    console.log("submitted")
+  }
 
   return (
     <>
@@ -136,7 +144,9 @@ const ProductDetails = () => {
           <Row className="review my-4">
             <Col md={6}>
               <h3>Reviews</h3>
-              {product.reviews.length === 0 && <Message>No review yet.</Message>}
+              {product.reviews.length === 0 && (
+                <Message>No review yet.</Message>
+              )}
               <ListGroup variant="flush">
                 {product.reviews.map((review) => (
                   <ListGroup.Item key={review._id}>
@@ -146,9 +156,51 @@ const ProductDetails = () => {
                     <p>{review.comment}</p>
                   </ListGroup.Item>
                 ))}
-                  <ListGroup.Item>
+                <ListGroup.Item>
+                  <h4>Write a Customer Review</h4>
 
-                  </ListGroup.Item>
+                  {loadingReview && <Loader />}
+                  {!userInfo ? (
+                    <Message>
+                      Please <Link to="/login">log in</Link> to write a review.
+                    </Message>
+                  ) : (
+                    <Form>
+                      <Form.Group controlId="rating" className="my-2">
+                        <Form.Control
+                          as="select"
+                          value={rating}
+                          onChange={(e) => setRating(e.target.value)}
+                        >
+                          <option value="">Please make a review</option>
+                          <option value="1">1 - Poor</option>
+                          <option value="1">2 - Fair</option>
+                          <option value="1">3 - Good</option>
+                          <option value="1">4 - VeryGood</option>
+                          <option value="1">5 - Excellent</option>
+                        </Form.Control>
+                      </Form.Group>
+                      <Form.Group>
+                        <Form.Label>Comment</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          row="3"
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                        ></Form.Control>
+                      </Form.Group>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        onClick={handleReviewSubmit}
+                        disabled={loadingReview}
+                        className="my-3"
+                      >
+                        Submit
+                      </Button>
+                    </Form>
+                  )}
+                </ListGroup.Item>
               </ListGroup>
             </Col>
           </Row>
