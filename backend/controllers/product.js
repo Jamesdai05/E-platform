@@ -100,6 +100,7 @@ const deleteProductsById=asyncHandler(async(req,res)=>{
 
 const createProductReview=asyncHandler(async(req,res)=>{
   // res.send("review")
+  const {rating,comment} =req.body;
   const product=await Product.findById(req.params.id);
 
   if(product){
@@ -114,7 +115,7 @@ const createProductReview=asyncHandler(async(req,res)=>{
       }
       const review ={
         name:req.user.name,
-        rating:Number(rating),
+        rating:Number(product.rating),
         comment,
         user:req.user._id,
       };

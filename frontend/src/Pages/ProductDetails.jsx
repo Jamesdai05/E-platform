@@ -43,9 +43,26 @@ const ProductDetails = () => {
     navigate("/cart");
   };
 
-  const handleReviewSubmit=(e)=>{
+  const handleReviewSubmit=async(e)=>{
     e.preventDefault();
-    console.log("submitted")
+    // console.log("submitted")
+    try {
+      await createReview({
+        productId,
+        rating,
+        comment,
+      }).unwrap();
+      refetch();
+      //Prompt that it is done
+      toast.success("Review submitted!");
+      // reset the form
+      setRating(0)
+      setComment("")
+
+    } catch (error) {
+      console.log(error.error)
+      toast.error(error?.data?.message || error?.error)
+    }
   }
 
   return (
