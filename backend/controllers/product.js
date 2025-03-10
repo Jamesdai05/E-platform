@@ -10,6 +10,18 @@ const getProducts=asyncHandler(async(req,res)=>{
   res.json(products)
 })
 
+
+const getProductsWithPagination=asyncHandler(async(req,res)=>{
+  const pageSize=2;
+  const page = Number(req.query.pagNumber) || 1; //the page number will be query number or the default 1.
+
+  const count=await Product.countDocuments(); //for mongodb database
+
+  const products=await Product.find({}).limit(pageSize).skip(pageSize-1);
+
+  res.json({products,page,pages:Math.ceil(count / pageSize)});
+})
+
 // @desc   fetch a single product
 // @route  GET /api/products/:id
 // @access public
@@ -135,10 +147,11 @@ const createProductReview=asyncHandler(async(req,res)=>{
 
 
 export {
-  getProducts,
+  // getProducts,
   getProductsById,
   createProduct,
   updateProductsById,
   deleteProductsById,
   createProductReview,
+  getProductsWithPagination,
 }

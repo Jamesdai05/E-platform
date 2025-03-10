@@ -22,8 +22,9 @@ const Home = () => {
   //   dataFetch()
   // },[])
 
-  const { data: products, isLoading, error } = useGetProductsQuery();
-
+  // const { data: products, isLoading, error } = useGetProductsQuery();
+  const { data, isLoading, error } = useGetProductsQuery();
+  console.log(data)
   const style = {
     display: "flex",
     justifyContent: "center",
@@ -39,7 +40,7 @@ const Home = () => {
       ) : (
         <>
           <h1>Latest Products</h1>
-          <Productlist products={products} style={style} />
+          <Productlist products={data.products} style={style} />
         </>
       )}
     </>
