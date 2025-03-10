@@ -4,6 +4,7 @@ import Loader from "../../components/Loader.jsx";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
+  useDeleteProductMutation,
 } from "../../slices/productsSlice.js";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -15,8 +16,19 @@ const Productls = () => {
   const [createProduct, { isLoading: loadingCreate }] =
     useCreateProductMutation();
 
-  const handleDelete = (id) => {
-    console.log("delete", id);
+  const [deleteProduct, {isLoading: loadingDelete}] = useDeleteProductMutation();
+
+  const handleDelete = async(id) => {
+    // console.log("delete", id);
+    if(window.confirm("Aryou sure you want to delete the product?")){
+      try {
+        await deleteProduct(id);
+        refetch();
+        toast.success("Product deleted!")
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error)
+      }
+    }
   };
 
   const handleCreate = async () => {
