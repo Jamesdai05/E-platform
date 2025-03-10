@@ -6,13 +6,17 @@ const Paginate = ({pages,page,isAdmin=false}) => {
   // to set the admin for the prodctlist for future development.
   return (
     pages>1 && (
-    <Pagination>
+    <Pagination className="justify-content-center my-4">
       {[...Array(pages).keys()].map(p=>(
-        <Link
-        key={p+1} to={!isAdmin ? `/page/${p+1}` : `admin/productlist/${p+1}` }>
+        // <Link
+        // key={p+1} to={!isAdmin ? `/page/${p+1}` : `admin/productlist/${p+1}` } style={{textDecoration:"none"}}>
 
-          <Pagination.Item active={p+1===page}>{p+1}</Pagination.Item>
-        </Link>
+          <Pagination.Item as={Link}
+          key={p+1}
+          to={!isAdmin ? `/page/${p+1}` : `admin/productlist/${p+1}` }
+          active={p+1===page}
+          aria-label={`go to page ${p+1}`}>{p+1}</Pagination.Item>
+        // </Link>
       ))}
     </Pagination>)
   )
