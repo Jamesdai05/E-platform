@@ -123,7 +123,7 @@ const createProductReview=asyncHandler(async(req,res)=>{
       product.reviews.push(review);
       product.numReviews=product.reviews.length;
       // a is accumulater and c is current element
-      product.rating=product.reviews.reduce((a,c)=>a + c.rating,0) / product.reviews.lenghth;
+      product.rating=product.reviews.reduce((a,c)=>a + c.rating,0) / product.reviews.length;
 
       await product.save();
       res.status(201).json({message:"Review submitted!"});
