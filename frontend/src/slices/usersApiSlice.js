@@ -31,12 +31,13 @@ export const usersApiSlice=apiSlice.injectEndpoints({
         body:data,
       }),
     }),
-    getusers:builder.query({
+    getUsers:builder.query({
       query:()=>({
-        url: USERS_URL,
+        url:USERS_URL,
         method:"GET",
       }),
-      providesTags: ['USERS'],
+      providesTags: ["USER"],
+      keepUnusedDataFor: 5,
     }),
   })
 });
@@ -46,4 +47,5 @@ export const {
   useRegistrationMutation,
   useLogoutMutation,
   useUpdateprofileMutation,
+  useGetUsersQuery,
 }=usersApiSlice;
