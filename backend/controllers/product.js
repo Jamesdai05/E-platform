@@ -94,6 +94,43 @@ const deleteProductsById=asyncHandler(async(req,res)=>{
   }
 })
 
+// @desc   Create a product review
+// @route  POST /api/products/:id/reviews
+// @access Private
+
+const createProductReview=asyncHandler(async(req,res)=>{
+  // res.send("review")
+  const product=await Product.findById(req.params.id);
+
+  if(product){
+
+    const alreadyReview=product.reviews.find(
+      // the review user and the user in the req to be the same or not
+      review=>review.user.toString()===req.user._id.toString()
+    );
+
+    if(alreadyReview){
+      return res.status(400).json("Product has been reviewed.");
+      }
+      const review ={
+        name:req.user.name,
+        rating:Number(rating),
+        comment,
+        user:req.user._id,
+      };
+
+      product.reviews.push(review);
+      product.numReviews=product.reviews.length;
+      // a is accumulater and c is current element
+      product.rating=product.reviews.reduce((a,c)=>a + c.rating,0) / product.reviews.lenghth;
+
+      await product.save();
+      res.status(201).json({message:"Review submitted!"});
+  }else{
+    res.status(400).json("Product not found.")
+  }
+})
+
 
 
 export {
@@ -102,4 +139,5 @@ export {
   createProduct,
   updateProductsById,
   deleteProductsById,
+  createProductReview,
 }
