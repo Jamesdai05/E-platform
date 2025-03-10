@@ -67,16 +67,18 @@ const ProductEdit = () => {
   }
 
   const handleUpload=async(e)=>{
-    console.log("upload!")
+    // console.log("upload!")
     // to check the data get in the frontend
     // console.log(e.target.files[0])
     const formData=new FormData();
     formData.append("image",e.target.files[0])
+
     try {
-      const res= await uploadProductImage(formData).unwrap();
+      const res = await uploadProductImage(formData).unwrap();
       toast.success(res.message);
       setImage(res.image);
     } catch (error) {
+      console.log(error.data);
       toast.error(error?.data?.message || error?.error);
     }
   }
@@ -187,9 +189,14 @@ const ProductEdit = () => {
                 name="image"
                 onChange={(e) => setImage(e.target.value)}
               />
-              <Form.Control type="file" label="Choose file to upload" onChange={handleUpload}></Form.Control>
+              <Form.Control
+                type="file"
+                label="Choose file"
+                onChange={handleUpload}
+              />
             </Form.Group>
-            <h6>Image uploading tool will be settle later.</h6>
+            {/* <h6>Image uploading tool will be settle later.</h6> */}
+            {loadingImage && <Loader />}
             <Button className="my-2" type="submit">
               Update Product
             </Button>

@@ -20,13 +20,15 @@ const app=express()
 
 const port =process.env.PORT || 5002
 
-app.use(cors(
-  {
-  origin:"http://localhost:3000",
-  credentials: true, /* This allows cookies to be sent with cross-origin requests*/
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  }
-))
+// app.use(cors(
+//   {
+//   origin:"http://localhost:3000",
+//   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   }
+// ))
+
+app.use(cors());
 // middleware for json data and form data
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -46,14 +48,15 @@ app.get("/",(req,res)=>{
 app.use("/api/products",productRoutes);
 app.use("/api/users",userRoutes);
 app.use("/api/orders",orderRoutes);
-app.use("/api/uploads",uploadRoutes);
+app.use("/api/upload",uploadRoutes);
 
 app.get("/api/config/paypal",(req,res)=>
   res.send({cliendId: process.env.PAYPAL_CLIENT_ID})
 );
 
+// serve static files
 const __dirname=path.resolve();// set __dirname to current directory
-app.use("/uploads",express.static(path.join(__dirname,"/uploads")))
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 app.use(notFound);
 app.use(errorHandler);

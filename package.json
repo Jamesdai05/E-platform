@@ -18,7 +18,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
     "server": "nodemon backend/server.js",
     "client": "npm start --prefix frontend",
     "test": "concurrently \"npm run server\" \"npm run client\"",
