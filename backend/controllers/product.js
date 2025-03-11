@@ -15,9 +15,12 @@ const getProductsWithPagination=asyncHandler(async(req,res)=>{
   const pageSize=8;
   const page = Number(req.query.pageNumber) || 1; //the page number will be query number or the default 1.
 
-  const count=await Product.countDocuments(); //for mongodb database
+  // to match the keyword with not casesensitive match, if no keyword then just be blank
+  const keyword=req.query.keyword ? {name: {$regex: req.query.keyword, $options: "i"}} : {};
 
-  const products=await Product.find({}).limit(pageSize).skip(pageSize *(page-1));
+  const count=await Product.countDocuments({...keyword}); //for mongodb database
+
+  const products=await Product.find({...keyword}).limit(pageSize).skip(pageSize *(page-1));
 
   res.json({products,page,pages:Math.ceil(count / pageSize)});
 })

@@ -11,7 +11,7 @@ import Paginate from "../components/Paginate.jsx";
 
 
 const Home = () => {
-    const {pageNumber}=useParams();
+    const {keyword,pageNumber}=useParams();
   // const [products,setProducts]=useState([])
   // const productsUrl="api/products"
 
@@ -25,7 +25,7 @@ const Home = () => {
   // },[])
 
   // const { data: products, isLoading, error } = useGetProductsQuery();
-  const { data, isLoading, error } = useGetProductsQuery({pageNumber});
+  const { data, isLoading, error } = useGetProductsQuery({keyword,pageNumber});
   // console.log(data)
   const style = {
     display: "flex",
