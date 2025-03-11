@@ -10,24 +10,25 @@ const SearchBox = () => {
 
   const handleSubmit=(e)=>{
     e.preventDefault();
-    console.log("submit");
+    // console.log("submit");
+    if(search.trim()){
+      navigate(`/search/${search}`)
+    }
   }
 
 
   return (
-    <div>
-      <Form onSubmit={handleSubmit} className="d-flex">
-        <Form.Control
-          type="search"
-          placeholder="Search product"
-          className="me-2"
-          aria-label="Search"
-          value={search}
-          onChange={e=>setSearch(e.target.value)}
-        />
-        <Button type="submit">Search</Button>
-      </Form>
-    </div>
+    <Form onSubmit={handleSubmit} className="d-flex me-auto">
+      <Form.Control
+        type="search"
+        placeholder="Search product"
+        className="me-2"
+        aria-label="Search"
+        value={search}
+        onChange={e=>setSearch(e.target.value)}
+      />
+      <Button type="submit" className="p-2 mx-2" variant="outline-secondary" >Search</Button>
+    </Form>
   );
 }
 export default SearchBox

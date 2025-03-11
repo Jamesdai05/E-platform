@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "../slices/usersApiSlice.js";
 import { logout } from "../slices/authSlice.js";
+import SearchBox from "./SearchBox.jsx";
 
 const Header = () => {
 
@@ -41,6 +42,7 @@ const Header = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
+            <SearchBox />
             <Nav.Link as={Link} to="/cart" style={fsStyle}>
               Cart <FaShoppingCart className="ms-0.5" />
               {cartItems.length > 0 && (
