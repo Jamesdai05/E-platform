@@ -12,7 +12,7 @@ const getProducts=asyncHandler(async(req,res)=>{
 
 
 const getProductsWithPagination=asyncHandler(async(req,res)=>{
-  const pageSize=8;
+  const pageSize=1;
   const page = Number(req.query.pageNumber) || 1; //the page number will be query number or the default 1.
 
   // to match the keyword with not casesensitive match, if no keyword then just be blank

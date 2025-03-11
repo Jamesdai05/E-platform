@@ -2,7 +2,7 @@ import { Pagination } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 
-const Paginate = ({pages,page,isAdmin=false}) => {
+const Paginate = ({pages,page,isAdmin=false,keyword=""}) => {
   // to set the admin for the prodctlist for future development.
   return (
     pages>1 && (
@@ -11,7 +11,7 @@ const Paginate = ({pages,page,isAdmin=false}) => {
 
           <Pagination.Item as={Link}
           key={p+1}
-          to={!isAdmin ? `/page/${p+1}` : `admin/productlist/${p+1}` }
+          to={!isAdmin ? keyword ? `/search/${keyword}/page/${p+1}` : `/page/${p+1}` : `admin/productlist/${p+1}` }
           active={p+1===page}
           aria-label={`go to page ${p+1}`}
           >{p+1}</Pagination.Item>

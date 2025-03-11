@@ -43,7 +43,7 @@ const Home = () => {
         <>
           <h1>Latest Products</h1>
           <Productlist products={data.products} style={style} />
-          <Paginate pages={data.pages} page={data.page} />
+          <Paginate pages={data.pages} page={data.page} keyword={keyword ? keyword : ""} />
         </>
       )}
     </>
