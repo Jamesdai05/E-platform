@@ -5,16 +5,17 @@ import Loader from "./Loader.jsx";
 import Message from "./Message.jsx";
 import { Link } from "react-router-dom";
 
-
-
 export const ProductCarousel = () => {
-  const {data:products,isLoading,error}=useGetTopProductsQuery();
+  const { data: products, isLoading, error } = useGetTopProductsQuery();
 
-  const style= {
+  const style = {
     width: "800px",
-    height: "400px",
-    objectFit: "cover",
-  }
+    height: "520px",
+    objectFit: "contain",
+    display: "flex",
+    justifyContent: "center",
+    margin: "auto",
+  };
   return (
     <>
       {isLoading && <Loader />}
@@ -27,9 +28,16 @@ export const ProductCarousel = () => {
           {products.map((product) => (
             <Carousel.Item key={product._id}>
               <Link to={`/product/${product._id}`}>
-                <Image src={product.image} text="top product" alt="product" style={style} />
+                <Image
+                  src={product.image}
+                  text="top product"
+                  alt="product"
+                  style={style}
+                />
                 <Carousel.Caption className="carousel-caption">
-                  <h3>{product.name}(${product.price})</h3>
+                  <h3>
+                    {product.name}(${product.price})
+                  </h3>
                 </Carousel.Caption>
               </Link>
             </Carousel.Item>
@@ -38,6 +46,6 @@ export const ProductCarousel = () => {
       )}
     </>
   );
-}
+};
 
 export default ProductCarousel;
