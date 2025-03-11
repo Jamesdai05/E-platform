@@ -7,6 +7,7 @@ import { useGetProductsQuery } from "../slices/productsSlice.js";
 import Message from "../components/Message.jsx";
 import { useParams } from "react-router-dom";
 import Paginate from "../components/Paginate.jsx";
+import ProductCarousel from "../components/ProductCarousel.jsx";
 
 
 
@@ -41,6 +42,7 @@ const Home = () => {
         <Message>{error?.data?.message || error?.error}</Message>
       ) : (
         <>
+          <ProductCarousel />
           <h1>Latest Products</h1>
           <Productlist products={data.products} style={style} />
           <Paginate pages={data.pages} page={data.page} keyword={keyword ? keyword : ""} />
