@@ -146,6 +146,19 @@ const products = [
     rating: 4.7,
     numReviews: 16760,
   },
+
+  {
+    name: 'Amazfit T-Rex 3 Military Smart Watch 48mm',
+    image: '/images/Watch-2.jpg',
+    description:
+      'The Amazfit T-Rex 3 tactical smart watch is designed for the adventurous individual seeking durability and versatility in their smartwatch. This smartwatch for men and women combines ruggedness with advanced technology, making it an ideal choice for outdoor enthusiasts. With a 48mm military-grade build, it resists extreme temperatures from 158°F to -22°F and is water-resistant up to 328 feet, perfect for surfing and freediving. Amazfit T-Rex 3 caters to a wide array of users, providing an extensive suite of functions and an authoritative design for any adventurer. ',
+    brand: 'AMAZFIT',
+    category: 'Electronics',
+    price: 370.89,
+    countInStock: 6,
+    rating: 4.4,
+    numReviews: 458,
+  },
 ]
 
 export default products
