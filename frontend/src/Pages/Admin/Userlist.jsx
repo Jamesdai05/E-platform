@@ -20,9 +20,11 @@ const Userlist = () => {
       try {
         await deleteUser(id);
         refetch();
-        toast.success("User is deleted!")
+        toast.success("User is deleted!", { position: "top-center" });
       } catch (error) {
-        toast.error(error?.data?.message || error?.error);
+        toast.error(error?.data?.message || error?.error, {
+          position: "top-center",
+        });
       }
     }
   }

@@ -38,7 +38,7 @@ const Productls = () => {
         refetch();
         toast.success("Template Product is created.");
       } catch (error) {
-        toast.error(error?.data?.message || error?.error);
+        toast.error(error?.data?.message || error?.error, {position: "top-center"});
       }
     }
   };

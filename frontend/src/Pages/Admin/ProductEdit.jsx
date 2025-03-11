@@ -50,10 +50,12 @@ const ProductEdit = () => {
       try {
         await updateProduct(updatedProduct).unwrap();
         refetch();
-        toast.success("Product is updated!");
+        toast.success("Product is updated!", { position: "top-center" });
         navigate("/admin/productList");
       } catch (error) {
-        toast.error(error?.data?.message || error?.error);
+        toast.error(error?.data?.message || error?.error, {
+          position: "top-center",
+        });
       }
 
     // const result=await updateProduct(updatedProduct);

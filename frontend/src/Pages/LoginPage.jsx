@@ -52,7 +52,7 @@ const LoginPage = () => {
       navigate(redirect);
     } catch (err) {
       console.log(err)
-      toast.error(err?.data?.message || err?.error);
+      toast.error(err?.data?.message || err?.error,{position:"top-center"});
     }
 
     // console.log(email, password);

@@ -35,10 +35,12 @@ const UserEdit = () => {
     try {
       await updateUser(updatedUser).unwrap();
       refetch();
-      toast.success("User is updated!");
+      toast.success("User is updated!", { position: "top-center" });
       navigate("/admin/userlist");
     } catch (error) {
-      toast.error(error?.data?.message || error?.error);
+      toast.error(error?.data?.message || error?.error, {
+        position: "top-center",
+      });
     }
   }
 

@@ -45,7 +45,7 @@ const Placeorder = () => {
       dispatch(clearCartItems());
       navigate(`/order/${res._id}`);
     } catch (error) {
-      toast.error(error);
+      toast.error(error,{position:"top-center"});
     }
   };
 

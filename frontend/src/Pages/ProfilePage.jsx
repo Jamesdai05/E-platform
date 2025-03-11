@@ -45,9 +45,13 @@ const ProfilePage = () => {
           password}).unwrap();
         // to update the credentials
         dispatch(setCredentials(res))
-        toast.success("Profile updated successfully.")
+        toast.success("Profile updated successfully.", {
+          position: "top-center",
+        });
       } catch (error) {
-        toast.error(error?.data?.Message || error?.error)
+        toast.error(error?.data?.Message || error?.error, {
+          position: "top-center",
+        });
       }
     }
   }

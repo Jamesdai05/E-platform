@@ -95,9 +95,11 @@ const OrderPage = () => {
     try {
       await deliverOrder(orderId);
       refetch();
-      toast.success("Order is delivered!")
+      toast.success("Order is delivered!", { position: "top-center" });
     } catch (error) {
-      toast.error(error?.data?.message || error?.message);
+      toast.error(error?.data?.message || error?.message, {
+        position: "top-center",
+      });
     }
   }
 
