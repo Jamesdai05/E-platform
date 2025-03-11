@@ -18,7 +18,7 @@ const storage=multer.diskStorage({
 
 // check the file type of the upload
 
-function fileFilter(file,cb){
+function fileFilter(req,file,cb){
   // to check the file and file type before uploading
   // if (!file || !file.originalname) {
   //   return cb(new Error('File is missing or invalid'), false);
@@ -46,6 +46,7 @@ const uploadSingleImage=upload.single("image");
 // middleware for the single image uploading
 
 router.post("/", (req,res)=>{
+  console.log("Request received:", req.body)
   uploadSingleImage(req,res,function(err){
     if (err) {
       return res.status(400).send({ message: err.message });
