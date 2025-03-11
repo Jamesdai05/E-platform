@@ -10,6 +10,11 @@ import { Link } from "react-router-dom";
 export const ProductCarousel = () => {
   const {data:products,isLoading,error}=useGetTopProductsQuery();
 
+  const style= {
+    width: "800px",
+    height: "400px",
+    objectFit: "cover",
+  }
   return (
     <>
       {isLoading && <Loader />}
@@ -22,9 +27,9 @@ export const ProductCarousel = () => {
           {products.map((product) => (
             <Carousel.Item key={product._id}>
               <Link to={`/product/${product._id}`}>
-                <Image src={product.image} text="top product" alt="product" fluid />
+                <Image src={product.image} text="top product" alt="product" style={style} />
                 <Carousel.Caption className="carousel-caption">
-                  <h3>{products.name}(${product.price})</h3>
+                  <h3>{product.name}(${product.price})</h3>
                 </Carousel.Caption>
               </Link>
             </Carousel.Item>
