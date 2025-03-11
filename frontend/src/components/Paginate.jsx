@@ -11,7 +11,7 @@ const Paginate = ({pages,page,isAdmin=false,keyword=""}) => {
 
           <Pagination.Item as={Link}
           key={p+1}
-          to={!isAdmin ? keyword ? `/search/${keyword}/page/${p+1}` : `/page/${p+1}` : `admin/productlist/${p+1}` }
+          to={!isAdmin ? keyword ? `/search/${keyword}/page/${p+1}` : `/page/${p+1}` : `/admin/productlist/${p+1}` }
           active={p+1===page}
           aria-label={`go to page ${p+1}`}
           >{p+1}</Pagination.Item>
