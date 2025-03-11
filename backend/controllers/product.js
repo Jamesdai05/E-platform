@@ -148,6 +148,21 @@ const createProductReview=asyncHandler(async(req,res)=>{
 })
 
 
+// @desc   Get top 3 product base on the rating.
+// @route  GET /api/products/top
+// @access Private
+
+
+const getTopProducts=asyncHandler(async(req,res)=>{
+  // get the top 3 products
+  const product = await Product.findById({}).sort({rating:-1}).limit(3);
+  if(product){
+    return res.status(200).json(product);
+  }
+  res.status(404).json({message:"Products not found."})
+})
+
+
 
 export {
   // getProducts,
@@ -157,4 +172,5 @@ export {
   deleteProductsById,
   createProductReview,
   getProductsWithPagination,
+  getTopProducts,
 }
