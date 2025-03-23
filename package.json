@@ -19,11 +19,12 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon backend/server.js",
-    "server": "nodemon backend/server.js",
+    "start": "node backend/server.js",
     "client": "npm start --prefix frontend",
     "test": "concurrently \"npm run server\" \"npm run client\"",
     "data:import": "node backend/seed.js",
-    "data:delete": "node backend/seed.js -d"
+    "data:delete": "node backend/seed.js -d",
+    "build":"npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
