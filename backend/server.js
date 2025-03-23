@@ -20,15 +20,15 @@ const app=express()
 
 const port =process.env.PORT || 5002
 
-// app.use(cors(
-//   {
-//   origin:"http://localhost:3000",
-//   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   }
-// ))
+app.use(cors(
+  {
+  origin:"http://localhost:3000",
+  credentials: true, /* This allows cookies to be sent with cross-origin requests*/
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  }
+))
 
-app.use(cors());
+// app.use(cors());
 // middleware for json data and form data
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

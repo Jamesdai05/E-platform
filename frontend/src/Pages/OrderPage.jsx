@@ -69,11 +69,12 @@ const OrderPage = () => {
     })
   }
 
-  async function onApproveTest() {
-    await payOrder({orderId,details:{payer:{}}});
-          refetch();
-          toast.success("Payment successful")
-  }
+  // this function is for paypal testing
+  // async function onApproveTest() {
+  //   await payOrder({orderId,details:{payer:{}}});
+  //         refetch();
+  //         toast.success("Payment successful")
+  // }
   function onError(err) {
      toast.error(err.message);
   }
@@ -209,18 +210,19 @@ const OrderPage = () => {
                   </ListGroup.Item>
                   {!order.isPaid && (
                     <ListGroup.Item>
-                      {isLoading && <Loader />}
+                      {loadingPay && <Loader />}
                       {isPending ? (
                         <Loader />
                       ) : (
                         <>
                           <div>
-                            <Button
+                            {/* for testing purpose */}
+                            {/* <Button
                               onClick={onApproveTest}
                               style={{ marginBottom: "10px" }}
                             >
                               Test pay order
-                            </Button>
+                            </Button> */}
                             <div>
                                 <PayPalButtons
                                   createOrder={createOrder}
