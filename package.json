@@ -2,7 +2,6 @@
   "name": "ecommerce-platform-v2",
   "version": "1.0.0",
   "description": "MERN stack to build an ecommerce platform.",
-  "Proxy" : "localhost:5000",
   "keywords": [
     "MERN"
   ],
