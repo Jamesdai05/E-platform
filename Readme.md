@@ -48,10 +48,9 @@ The technologies applied in this project are:
 
 &nbsp;Database seeding
 
-
 ## Project Link
 
-    You can visit the website with the link [link](http:www.google.com) here
+    Under construction.
 
 ## What I have learnt
 
