@@ -20,15 +20,15 @@ const app=express()
 
 const port =process.env.PORT || 5002
 
-// app.use(cors(
-//   {
-//   origin:"http://localhost:3000",
-//   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   }
-// ))
+app.use(cors(
+  {
+  origin:"http://localhost:3000",
+  credentials: true, /* This allows cookies to be sent with cross-origin requests*/
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  }
+))
 
-app.use(cors());
+// app.use(cors());
 // middleware for json data and form data
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -58,6 +58,8 @@ app.get("/api/config/paypal",(req,res)=>
 const __dirname=path.resolve();// set __dirname to current directory
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
+console.log(__dirname);
+
 // for deployment
 if(process.env.NODE_ENV ==="production"){
   // set static folder
@@ -66,6 +68,7 @@ if(process.env.NODE_ENV ==="production"){
 
   app.get("*",(req,res)=>{
     res.sendFile(path.resolve(__dirname,"frontend","build","index.html"))
+    // res.sendFile(path.join(__dirname,"/frontend/build/index.html"))
   })
 
 }else {
