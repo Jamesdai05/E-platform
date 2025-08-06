@@ -87,9 +87,10 @@ const OrderPage = () => {
           },
         },
       ],
-    }).then(orderId=>{
-      return orderId;
     })
+    // .then(orderId=>{
+    //   return orderId;
+    // })
   }
 
   const handleDeliver=async()=>{

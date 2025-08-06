@@ -22,7 +22,8 @@ const port =process.env.PORT || 5002
 
 app.use(cors(
   {
-  origin:"http://localhost:3000",
+  // origin:"http://localhost:3000",
+  origin: ["https://your-frontend-url.onrender.com", "http://localhost:3000"],
   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
   allowedHeaders: ['Content-Type', 'Authorization'],
   }
