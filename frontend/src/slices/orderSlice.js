@@ -4,6 +4,7 @@ import { apiSlice } from "./apiSlice.js";
 
 export const ordersApiSlice=apiSlice.injectEndpoints({
   endpoints:(builder)=>({
+    // post the order to the database
     createOrder: builder.mutation({
       query: (order) => ({
         url: ORDERS_URL,
@@ -11,6 +12,7 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
         body:{...order},
       }),
     }),
+    // get the order data
     getOrderDetails:builder.query({
       query:(orderId)=>({
         url:`${ORDERS_URL}/${orderId}`,
@@ -30,26 +32,28 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    // get yourself data
     getmyorders:builder.query({
       query:()=>({
         url:`${ORDERS_URL}/mine`,
       }),
-    providesTags:["Products"],
+      providesTags:["Orders"],
     }),
     getallorders:builder.query({
       query:()=>({
         url:ORDERS_URL,
       }),
-    providesTags:["Products"],
-    keepUnusedDataFor: 5,
+      providesTags:["Orders"],
+      keepUnusedDataFor: 5,
     }),
+    // update the status of the delivery.
     deliveredorder:builder.mutation({
       query:(orderId)=>({
         url:`${ORDERS_URL}/${orderId}`,
         method:"PUT",
       }),
-    providesTags:["Products"],
-    keepUnusedDataFor: 5,
+      providesTags:["Orders"],
+      keepUnusedDataFor: 5,
     }),
   })
 })
