@@ -60,7 +60,7 @@ const ProductDetails = () => {
       setComment("")
 
     } catch (error) {
-      console.log(error.error)
+      console.log(error?.error)
       toast.error(error?.data?.message || error?.error)
     }
   }

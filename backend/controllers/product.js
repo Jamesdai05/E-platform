@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
-import Product from "../models/productModel.js"
+import Product from "../models/productModel.js";
+import mongoose from "mongoose";
 
 // @desc   fetch all products
 // @route  GET /api/products
@@ -30,7 +31,15 @@ const getProductsWithPagination=asyncHandler(async(req,res)=>{
 // @access public
 
 const getProductsById=asyncHandler(async(req,res)=>{
-  const product = await Product.findById(req.params.id)
+  const productId=req.params.id
+
+  // res.send(productId)
+  // console.log(productId)
+  // if (!mongoose.Types.ObjectId.isValid(productId)) {
+  //   return res.status(400).json({ message: "Invalid product ID format." });
+  // }
+
+  const product = await Product.findById(productId)
   if(product){
     return res.json(product);
   }
@@ -165,7 +174,7 @@ const getTopProducts=asyncHandler(async(req,res)=>{
 
 
 export {
-  // getProducts,
+  getProducts,
   getProductsById,
   createProduct,
   updateProductsById,
