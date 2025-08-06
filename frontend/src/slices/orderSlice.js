@@ -52,7 +52,7 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
         url:`${ORDERS_URL}/${orderId}`,
         method:"PUT",
       }),
-      providesTags:["Orders"],
+      invalidatesTags:["Orders"],
       keepUnusedDataFor: 5,
     }),
   })
