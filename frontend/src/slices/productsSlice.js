@@ -19,7 +19,7 @@ export const productsApiSlice=apiSlice.injectEndpoints({
       query: (productId) => ({
         url: `${PRODUCTS_URL}/${productId}`,
       }),
-      // keepUnusedDataFor: 5, // Cache data for 5 seconds
+      keepUnusedDataFor: 5, // Cache data for 5 seconds
     }),
     createProduct:builder.mutation({
       query:()=>({
