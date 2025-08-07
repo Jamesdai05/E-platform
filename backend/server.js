@@ -20,15 +20,13 @@ const app=express()
 
 const port =process.env.PORT || 5002
 
-app.use(cors(
-  {
+app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ["https://ecommerce-frontend-nufw.onrender.com", process.env.FRONTEND_URL || "https://e-platform-3.onrender.com"]
+    ? true // Allow same origin in production since frontend is served from same domain
     : "http://localhost:3000",
   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
   allowedHeaders: ['Content-Type', 'Authorization'],
-  }
-))
+}))
 
 // app.use(cors());
 // middleware for json data and form data
@@ -56,19 +54,19 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 console.log(__dirname);
 
-// for deployment
-if(process.env.NODE_ENV ==="production"){
-  // set static folder
-  app.use(express.static(path.join(__dirname,"/frontend/build")))
+// Single service deployment - serve both API and static files
+if(process.env.NODE_ENV === "production"){
+  // Set static folder
+  app.use(express.static(path.join(__dirname, "/frontend/build")));
 
-  app.get("*",(req,res)=>{
-    res.sendFile(path.resolve(__dirname,"frontend","build","index.html"))
-  })
-
-}else {
-  app.get("/",(req,res)=>{
-    res.send("API is running...")
-  })
+  // Serve React app for all non-API routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running in development mode...");
+  });
 }
 
 
