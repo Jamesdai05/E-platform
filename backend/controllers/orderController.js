@@ -33,27 +33,26 @@ const addOrderItems = asyncHandler(async (req, res) => {
     }
 
     // Extract product IDs and validate format
-    const productIds = orderItems.map(item => {
-      try {
-        return mongoose.Types.ObjectId(item._id);
-      } catch (error) {
-        throw new Error(`Invalid product ID: ${item._id}`);
-      }
+    const invalidItem=orderItems.find(item=>!mongoose.Types.ObjectId.isValid(item._id))
+
+    if(invalidItem){
+      throw new Error(`Invalid product ID: ${invalidItem._id}`)
+    }
+
+    // map orderItems from DB using a validated IDs
+    // Fetch all products from DB using validated IDs
+    const itemsFromDB = await Product.find({
+      _id: { $in: orderItems.map(item => item._id) },
     });
 
-    // Get products from database with stock validation
-    const itemsFromDB = await Product.find({ _id: { $in: productIds } });
 
-    if (!itemsFromDB || itemsFromDB.length !== orderItems.length) {
-      return res.status(400).json({ message: "Some products not found or invalid" });
-    }
 
     // Map order items with validation
     const dbOrderItems = orderItems.map((itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
       );
-
+      console.log(typeof itemFromClient._id);
       if (!matchingItemFromDB) {
         throw new Error(`Product not found: ${itemFromClient._id}`);
       }
@@ -84,7 +83,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
       orderItems: dbOrderItems,
       user: req.user._id,
       shippingAddress: {
-        address: shippingAddress.address?.trim(),
+        address: shippingAddress.address?.trim() || "",
         city: shippingAddress.city?.trim(),
         postalCode: shippingAddress.postalCode?.trim(),
         country: shippingAddress.country?.trim(),

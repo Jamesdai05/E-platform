@@ -17,7 +17,7 @@ const importDB=async()=>{
     await User.deleteMany();
     await Product.deleteMany();
 
-    //
+    //set the first user as admin
     const createUsers = await User.insertMany(users);
     const adminUser = createUsers[0]._id;
 
