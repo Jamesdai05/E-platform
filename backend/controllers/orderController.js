@@ -170,8 +170,9 @@ const updateOrderToDeliver=asyncHandler(async(req,res)=>{
 // @access private/Admin
 const updateOrderToPaid = asyncHandler(async (req, res) => {
   try {
-    console.log('Processing payment for order:', req.params.id);
-    console.log('Payment details:', JSON.stringify(req.body, null, 2));
+    // To check the payment id and the details
+    // console.log('Processing payment for order:', req.params.id);
+    // console.log('Payment details:', JSON.stringify(req.body, null, 2));
 
     // Validate request body
     if (!req.body.id) {
@@ -184,7 +185,7 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    console.log('Order found:', order._id, 'Total:', order.totalPrice);
+    // console.log('Order found:', order._id, 'Total:', order.totalPrice);
 
     // Check if order is already paid
     if (order.isPaid) {

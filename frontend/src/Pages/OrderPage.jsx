@@ -40,6 +40,7 @@ const OrderPage = () => {
 
     useEffect(() => {
         if (!errorPayPal && !loadingPayPal && paypal?.clientId) {
+            // to confirm the clientId is there.
             console.log(
                 "Loading PayPal script with client ID:",
                 paypal.clientId
@@ -73,7 +74,7 @@ const OrderPage = () => {
     }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
     const onApprove = async function (data, actions) {
-        console.log("PayPal onApprove called with data:", data);
+        // console.log("PayPal onApprove called with data:", data);
         try {
             const details = await actions.order.capture();
             console.log("PayPal capture successful:", details);
