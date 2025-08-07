@@ -11,31 +11,50 @@ const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
  *
  */
 async function getPayPalAccessToken() {
-  // Authorization header requires base64 encoding
-  const auth = Buffer.from(PAYPAL_CLIENT_ID + ':' + PAYPAL_APP_SECRET).toString(
-    'base64'
-  );
+  try {
+    // Validate environment variables
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_APP_SECRET || !PAYPAL_API_URL) {
+      throw new Error('Missing PayPal environment variables');
+    }
 
-  const url = `${PAYPAL_API_URL}/v1/oauth2/token`;
+    // Authorization header requires base64 encoding
+    const auth = Buffer.from(PAYPAL_CLIENT_ID + ':' + PAYPAL_APP_SECRET).toString(
+      'base64'
+    );
 
-  const headers = {
-    Accept: 'application/json',
-    'Accept-Language': 'en_US',
-    Authorization: `Basic ${auth}`,
-  };
+    const url = `${PAYPAL_API_URL}/v1/oauth2/token`;
 
-  const body = 'grant_type=client_credentials';
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body,
-  });
+    const headers = {
+      Accept: 'application/json',
+      'Accept-Language': 'en_US',
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
 
-  if (!response.ok) throw new Error('Failed to get access token');
+    const body = 'grant_type=client_credentials';
 
-  const paypalData = await response.json();
+    console.log('Requesting PayPal access token from:', url);
 
-  return paypalData.access_token;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('PayPal access token error:', response.status, errorText);
+      throw new Error(`Failed to get access token: ${response.status} ${errorText}`);
+    }
+
+    const paypalData = await response.json();
+    console.log('PayPal access token obtained successfully');
+
+    return paypalData.access_token;
+  } catch (error) {
+    console.error('Error getting PayPal access token:', error);
+    throw error;
+  }
 }
 
 /**
@@ -71,21 +90,45 @@ export async function checkIfNewTransaction(orderModel, paypalTransactionId) {
  *
  */
 export async function verifyPayPalPayment(paypalTransactionId) {
-  const accessToken = await getPayPalAccessToken();
-  const paypalResponse = await fetch(
-    `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`,
-    {
+  try {
+    /* console.log('Verifying PayPal payment for transaction ID:', paypalTransactionId); */
+
+    const accessToken = await getPayPalAccessToken();
+    const url = `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`;
+
+    console.log('Making PayPal verification request to:', url);
+
+    const paypalResponse = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-    }
-  );
-  if (!paypalResponse.ok) throw new Error('Failed to verify payment');
+    });
 
-  const paypalData = await paypalResponse.json();
-  return {
-    verified: paypalData.status === 'COMPLETED',
-    value: paypalData.purchase_units[0].amount.value,
-  };
+    if (!paypalResponse.ok) {
+      const errorText = await paypalResponse.text();
+      console.error('PayPal verification error:', paypalResponse.status, errorText);
+      throw new Error(`Failed to verify payment: ${paypalResponse.status} ${errorText}`);
+    }
+
+    const paypalData = await paypalResponse.json();
+    console.log('PayPal verification response:', JSON.stringify(paypalData, null, 2));
+
+    const isCompleted = paypalData.status === 'COMPLETED';
+    const paymentValue = paypalData.purchase_units?.[0]?.amount?.value;
+
+    if (!paymentValue) {
+      throw new Error('Payment amount not found in PayPal response');
+    }
+
+    console.log(`Payment verification result: verified=${isCompleted}, value=${paymentValue}`);
+
+    return {
+      verified: isCompleted,
+      value: paymentValue,
+    };
+  } catch (error) {
+    console.error('Error verifying PayPal payment:', error);
+    throw error;
+  }
 }

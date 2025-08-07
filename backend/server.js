@@ -52,7 +52,7 @@ app.use("/api/orders",orderRoutes);
 app.use("/api/upload",uploadRoutes);
 
 app.get("/api/config/paypal",(req,res)=>
-  res.send({cliendId: process.env.PAYPAL_CLIENT_ID})
+  res.send({clientId: process.env.PAYPAL_CLIENT_ID})
 );
 
 // serve static files

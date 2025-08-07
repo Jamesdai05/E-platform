@@ -79,7 +79,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
     }
 
     // Create order
-    // console.log(req.user)
     const order = new Order({
       orderItems: dbOrderItems,
       user: req.user._id,
@@ -170,39 +169,76 @@ const updateOrderToDeliver=asyncHandler(async(req,res)=>{
 // @route  PUT api/orders/:id/pay
 // @access private/Admin
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  // verified the payment
-  const { verified, value } = await verifyPayPalPayment(req.body.id);
-  if (!verified) throw new Error('Payment not verified');
+  try {
+    console.log('Processing payment for order:', req.params.id);
+    console.log('Payment details:', JSON.stringify(req.body, null, 2));
 
-  // check if this transaction has been used before
-  const isNewTransaction = await checkIfNewTransaction(Order, req.body.id);
-  if (!isNewTransaction) throw new Error('Transaction has been used before');
+    // Validate request body
+    if (!req.body.id) {
+      return res.status(400).json({ message: 'PayPal transaction ID is required' });
+    }
 
-  const order = await Order.findById(req.params.id);
+    // Find the order first
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-  if (order) {
-    // check the correct amount was paid
-    const paidCorrectAmount = order.totalPrice.toString() === value;
-    if (!paidCorrectAmount) throw new Error('Incorrect amount paid');
+    console.log('Order found:', order._id, 'Total:', order.totalPrice);
 
+    // Check if order is already paid
+    if (order.isPaid) {
+      return res.status(400).json({ message: 'Order is already paid' });
+    }
+
+    // Verify the payment with PayPal
+    const { verified, value } = await verifyPayPalPayment(req.body.id);
+    if (!verified) {
+      return res.status(400).json({ message: 'Payment not verified with PayPal' });
+    }
+
+    // Check if this transaction has been used before
+    const isNewTransaction = await checkIfNewTransaction(Order, req.body.id);
+    if (!isNewTransaction) {
+      return res.status(400).json({ message: 'Transaction has been used before' });
+    }
+
+    // Check the correct amount was paid (with floating point tolerance)
+    const orderAmount = parseFloat(order.totalPrice.toString());
+    const paidAmount = parseFloat(value);
+    const tolerance = 0.01; // 1 cent tolerance for floating point precision
+
+    console.log(`Amount comparison: Order=${orderAmount}, Paid=${paidAmount}, Difference=${Math.abs(orderAmount - paidAmount)}`);
+
+    const paidCorrectAmount = Math.abs(orderAmount - paidAmount) <= tolerance;
+    if (!paidCorrectAmount) {
+      return res.status(400).json({
+        message: `Incorrect amount paid. Expected: $${orderAmount}, Received: $${paidAmount}`
+      });
+    }
+
+    // Update order with payment information
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {
       id: req.body.id,
-      status: req.body.status,
-      update_time: req.body.update_time,
-      email_address: req.body.payer.email_address,
+      status: req.body.status || 'COMPLETED',
+      update_time: req.body.update_time || new Date().toISOString(),
+      email_address: req.body.payer?.email_address || 'N/A',
     };
 
     const updatedOrder = await order.save();
+    console.log('Order payment updated successfully:', updatedOrder._id);
 
     res.json(updatedOrder);
-  } else {
-    res.status(404);
-    throw new Error('Order not found');
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    res.status(500).json({
+      message: error.message || 'Error processing payment',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
-
 
 // @desc   get all orders (to be delivered)
 // @route  GET api/orders
