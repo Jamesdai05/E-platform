@@ -52,7 +52,7 @@ The technologies applied in this project are:
 
 ## Project Link
 
-&nbsp;Project is hosted on Render. You can visit it here: [E-Platform on Render](https://ecommerce-frontend.onrender.com)
+&nbsp;Project is hosted on Render. You can visit it here: [E-Platform on Render](https://e-shop-single-service.onrender.com/)
 
 ## What I have learnt
 
