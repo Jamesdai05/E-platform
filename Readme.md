@@ -15,7 +15,7 @@ It is a project that using the MERN stack(& Reduxtoolkits) to build a simple e-c
 The technologies applied in this project are:
 
 - ⠀⠀MERN (MongoDB,Express,NodeJs,React)
-- ⠀⠀Redux & Redux toolkit
+- ⠀⠀Redux toolkits Query
 - ⠀⠀React-BootStrap
 
 ## Features
