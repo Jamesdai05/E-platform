@@ -4,7 +4,7 @@
 
 ## Project Introduction
 
-This name of the project is E-platform, which is a full-stack web application
+This name of the project is E-platform, which is a fullstack web application
 built using the MERN (MongoDB, Express, React,Nodejs).
 It is a project that using the MERN stack(& Reduxtoolkits) to build a simple e-commerce platform.
 
@@ -42,15 +42,17 @@ The technologies applied in this project are:
 
 &nbsp;Admin order management
 
-&nbsp;;Product reviews and rating
+&nbsp;Product reviews and rating
 
 &nbsp;Checkout process (shipping, payment method, etc)
 
 &nbsp;Database seeding
 
+&nbsp;Web hosting
+
 ## Project Link
 
-    Under construction.
+&nbsp;Project is hosted on Render. You can visit it here: [E-Platform on Render](https://ecommerce-frontend.onrender.com)
 
 ## What I have learnt
 
@@ -74,3 +76,4 @@ The technologies applied in this project are:
 - Add product sorting by category
 - Add the user password recovery
 - Add the product filtering by price
+- Add the status update of delivery(on the way,delivered...)
