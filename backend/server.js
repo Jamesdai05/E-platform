@@ -22,8 +22,9 @@ const port =process.env.PORT || 5002
 
 app.use(cors(
   {
-  // origin:"http://localhost:3000",
-  origin: ["https://ecommerce-frontend-nufw.onrender.com", "http://localhost:3000"],
+  origin: process.env.NODE_ENV === 'production'
+    ? ["https://ecommerce-frontend-nufw.onrender.com", process.env.FRONTEND_URL || "https://e-platform-3.onrender.com"]
+    : "http://localhost:3000",
   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
   allowedHeaders: ['Content-Type', 'Authorization'],
   }
@@ -35,12 +36,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cookieParser())
-
-
-app.get("/",(req,res)=>{
-  res.send("API is running...")
-})
-
 
 //get products
 // app.get("/api/products",(req,res)=>{
@@ -64,12 +59,10 @@ console.log(__dirname);
 // for deployment
 if(process.env.NODE_ENV ==="production"){
   // set static folder
-
   app.use(express.static(path.join(__dirname,"/frontend/build")))
 
   app.get("*",(req,res)=>{
     res.sendFile(path.resolve(__dirname,"frontend","build","index.html"))
-    // res.sendFile(path.join(__dirname,"/frontend/build/index.html"))
   })
 
 }else {
