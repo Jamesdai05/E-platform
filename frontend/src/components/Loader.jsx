@@ -6,6 +6,7 @@ const Loader = () => {
     height: "150px",
     margin: "auto",
     display: "block",
+    marginTop:"20em",
     // justifyContent:"center",
     // alignItems:"center"
   };

@@ -1,7 +1,7 @@
 // import { useEffect, useState } from "react";
 import Loader from "../components/Loader.jsx";
 import Productlist from "../components/Productlist.jsx";
-import { useGetProductsQuery } from "../slices/productsSlice.js";
+import { useGetProductsQuery, useGetTopProductsQuery } from "../slices/productsSlice.js";
 // import products from "../products";
 // import axios from 'axios';
 import Message from "../components/Message.jsx";
@@ -26,29 +26,46 @@ const Home = () => {
   // },[])
 
   // const { data: products, isLoading, error } = useGetProductsQuery();
-  const { data, isLoading, error } = useGetProductsQuery({keyword,pageNumber});
+  const { data, isLoading:isLoadingProducts, error:productError } = useGetProductsQuery({keyword,pageNumber});
+  // carousel products
+  const {
+      data: carouselData,
+      isLoading: isLoadingCarousel,
+      error: carouselError ,
+ } = useGetTopProductsQuery();
   // console.log(data)
+  // combined loading state
+  const isLoading = isLoadingProducts || isLoadingCarousel;
   const style = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   };
-
+  console.log("carouselData:", carouselData)
   return (
-    <>
-      {isLoading ? (
-        <Loader />
-      ) : error ? (
-        <Message>{error?.data?.message || error?.error}</Message>
-      ) : (
-        <>
-          <ProductCarousel />
-          <h1>Latest Products</h1>
-          <Productlist products={data.products} style={style} />
-          <Paginate pages={data.pages} page={data.page} keyword={keyword ? keyword : ""} />
-        </>
-      )}
-    </>
+      <>
+          {isLoading ? (
+              <Loader />
+          ) : productError || carouselError ? (
+              <Message>
+                  {productError?.data?.message ||
+                      productError?.error ||
+                      carouselError?.data?.message ||
+                      carouselError?.error}
+              </Message>
+          ) : (
+              <>
+                  <ProductCarousel products={carouselData || []} />
+                  <h1>Latest Products</h1>
+                  <Productlist products={data.products} style={style} />
+                  <Paginate
+                      pages={data.pages}
+                      page={data.page}
+                      keyword={keyword ? keyword : ""}
+                  />
+              </>
+          )}
+      </>
   );
 };
 

@@ -1,12 +1,12 @@
 // import { useState } from "react";
 import { Carousel, Image } from "react-bootstrap";
-import { useGetTopProductsQuery } from "../slices/productsSlice.js";
-import Loader from "./Loader.jsx";
-import Message from "./Message.jsx";
+// import { useGetTopProductsQuery } from "../slices/productsSlice.js";
+// import Loader from "./Loader.jsx";
+// import Message from "./Message.jsx";
 import { Link } from "react-router-dom";
 
-export const ProductCarousel = () => {
-  const { data: products, isLoading, error } = useGetTopProductsQuery();
+export const ProductCarousel = ({products}) => {
+  // const { data: products, isLoading, error } = useGetTopProductsQuery();
 
   const style = {
     width: "800px",
@@ -18,12 +18,8 @@ export const ProductCarousel = () => {
   };
   return (
     <>
-      {isLoading && <Loader />}
-      {isLoading ? (
-        <Loader />
-      ) : error ? (
-        <Message>{error?.data?.meesage || error?.error}</Message>
-      ) : (
+      {/* {isLoading && <Loader />} */}
+      {products && products.length>0 ? (
         <Carousel className="container" pause="hover">
           {products.map((product) => (
             <Carousel.Item key={product._id}>
@@ -43,7 +39,7 @@ export const ProductCarousel = () => {
             </Carousel.Item>
           ))}
         </Carousel>
-      )}
+      ) : (<div>No products available for the carousel.</div>)}
     </>
   );
 };
