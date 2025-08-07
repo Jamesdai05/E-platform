@@ -58,11 +58,11 @@ The technologies applied in this project are:
 
   &nbsp; React state management
 
-  &nbsp; React & react reduxtoolkit state management
+  &nbsp; React & Reduxtoolkit / Query state management
 
   &nbsp; Database seeding
 
-  &nbsp; Datamodel design
+  &nbsp; Data model design
 
   &nbsp; MVC Model enhance
 
