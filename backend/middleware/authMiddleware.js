@@ -15,7 +15,7 @@ const protectRoute=asyncHandler(
       const decoded=jwt.verify(token,process.env.JWT_SECRET);
       // console.log(decoded);
       // this allow for the other steps and show only required info without password.
-      req.user = await User.findById(decoded.useId).select("-password")
+      req.user = await User.findById(decoded.userId).select("-password")
       // console.log(req.user)
       next();
     }catch(e){

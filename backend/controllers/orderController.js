@@ -50,7 +50,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     // Map order items with validation
     const dbOrderItems = orderItems.map((itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
+        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id.toString()
       );
       console.log(typeof itemFromClient._id);
       if (!matchingItemFromDB) {
@@ -79,6 +79,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     }
 
     // Create order
+    // console.log(req.user)
     const order = new Order({
       orderItems: dbOrderItems,
       user: req.user._id,
