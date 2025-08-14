@@ -11,8 +11,56 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-
 dotenv.config()
+
+// Validate critical environment variables on startup
+function validateEnvironmentVariables() {
+  const requiredVars = {
+    'MONGO_URI': process.env.MONGO_URI,
+    'JWT_SECRET': process.env.JWT_SECRET,
+    'NODE_ENV': process.env.NODE_ENV,
+  };
+
+  const paypalVars = {
+    'PAYPAL_CLIENT_ID': process.env.PAYPAL_CLIENT_ID,
+    'PAYPAL_APP_SECRET': process.env.PAYPAL_APP_SECRET,
+    'PAYPAL_API_URL': process.env.PAYPAL_API_URL,
+  };
+
+  const missingRequired = [];
+  const missingPaypal = [];
+
+  // Check required variables
+  Object.entries(requiredVars).forEach(([key, value]) => {
+    if (!value) missingRequired.push(key);
+  });
+
+  // Check PayPal variables
+  Object.entries(paypalVars).forEach(([key, value]) => {
+    if (!value) missingPaypal.push(key);
+  });
+
+  if (missingRequired.length > 0) {
+    console.error('❌ CRITICAL ERROR - Missing required environment variables:');
+    console.error('Missing:', missingRequired.join(', '));
+    console.error('\n🔧 These variables are required for the application to function.');
+    console.error('Please add them to your environment and restart the server.');
+    process.exit(1);
+  }
+
+  if (missingPaypal.length > 0) {
+    console.warn('⚠️  WARNING - Missing PayPal environment variables:');
+    console.warn('Missing:', missingPaypal.join(', '));
+    console.warn('\n💡 PayPal payments will not work until these are configured.');
+    console.warn('The application will start, but payment processing will fail.');
+    console.warn('See RENDER_DEPLOYMENT.md for setup instructions.\n');
+  } else {
+    console.log('✅ PayPal environment variables configured successfully');
+  }
+}
+
+// Validate environment variables before starting
+validateEnvironmentVariables();
 
 connectDB()
 

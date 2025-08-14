@@ -3,6 +3,49 @@ dotenv.config();
 const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
 
 /**
+ * Validates that all required PayPal environment variables are present
+ * @throws {Error} If any required environment variables are missing
+ */
+function validatePayPalEnvironmentVariables() {
+  const missingVars = [];
+
+  if (!PAYPAL_CLIENT_ID) missingVars.push('PAYPAL_CLIENT_ID');
+  if (!PAYPAL_APP_SECRET) missingVars.push('PAYPAL_APP_SECRET');
+  if (!PAYPAL_API_URL) missingVars.push('PAYPAL_API_URL');
+
+  if (missingVars.length > 0) {
+    const errorMessage = `
+❌ PayPal Configuration Error - Missing Environment Variables:
+
+Missing variables: ${missingVars.join(', ')}
+
+🔧 To fix this issue:
+
+1. In your Render dashboard:
+   - Go to your service settings
+   - Navigate to "Environment" tab
+   - Add the following environment variables:
+
+   PAYPAL_CLIENT_ID=your_paypal_client_id_here
+   PAYPAL_APP_SECRET=your_paypal_app_secret_here
+   PAYPAL_API_URL=https://api-m.sandbox.paypal.com (for sandbox)
+   PAYPAL_API_URL=https://api-m.paypal.com (for production)
+
+2. Get your PayPal credentials from:
+   - Visit: https://developer.paypal.com/developer/applications/
+   - Create or select your application
+   - Copy the Client ID and Client Secret
+
+3. After adding the variables, redeploy your service in Render
+
+📚 For detailed instructions, see RENDER_DEPLOYMENT.md
+    `.trim();
+
+    throw new Error(errorMessage);
+  }
+}
+
+/**
  * Fetches an access token from the PayPal API.
  * @see {@link https://developer.paypal.com/reference/get-an-access-token/#link-getanaccesstoken}
  *
@@ -12,10 +55,8 @@ const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
  */
 async function getPayPalAccessToken() {
   try {
-    // Validate environment variables
-    if (!PAYPAL_CLIENT_ID || !PAYPAL_APP_SECRET || !PAYPAL_API_URL) {
-      throw new Error('Missing PayPal environment variables');
-    }
+    // Validate environment variables with detailed error message
+    validatePayPalEnvironmentVariables();
 
     // Authorization header requires base64 encoding
     const auth = Buffer.from(PAYPAL_CLIENT_ID + ':' + PAYPAL_APP_SECRET).toString(
