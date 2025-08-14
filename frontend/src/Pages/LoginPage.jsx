@@ -41,7 +41,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     // validate the form
-    if (!email || !password) {
+    if (!email || !password || password.length< 8) {
       toast.error("Please fill in all fields!");
       return;
     }

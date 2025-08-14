@@ -43,16 +43,16 @@ const addOrderItems = asyncHandler(async (req, res) => {
     // Fetch all products from DB using validated IDs
     const itemsFromDB = await Product.find({
       _id: { $in: orderItems.map(item => item._id) },
-    });
+    }).select('_id name image price countInStock');
 
 
 
-    // Map order items with validation
+    // Map order items with validation(compare the id from client and the id from db)
     const dbOrderItems = orderItems.map((itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id.toString()
       );
-      console.log(typeof itemFromClient._id);
+      // console.log(typeof itemFromClient._id);
       if (!matchingItemFromDB) {
         throw new Error(`Product not found: ${itemFromClient._id}`);
       }

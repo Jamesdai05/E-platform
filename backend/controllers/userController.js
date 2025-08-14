@@ -15,26 +15,21 @@ const authUser=asyncHandler(async(req,res)=>{
 
    const user = await User.findOne({ email });
   // console.log(user)
-  if(user && (await user.matchPassword(password))){
+  if(user  && (await user.matchPassword(password) && !user.isDisabled)){
     // jsonwebtoke setup
     generateToken(res,user._id)
     // const token=jwt.sign({useId:user._id},process.env.JWT_SECRET,{
     //   expiresIn:"10d",
     // })
 
-    // // cookie named jwt, and set the cookie options
-    // res.cookie("jwt",token,{
-    //   httpOnly:true,
-    //   secure: process.env.NODE_ENV !== "development",
-    //   sameSite:"none",
-    //   maxAge: 10 * 24 * 60 *60 * 1000 //to be 10days
-    // })
+
 
     return res.status(200).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
+        // isDisabled: user.isDisabled,
       });
   }
   res.status(401)
