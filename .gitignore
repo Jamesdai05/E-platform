@@ -20,7 +20,7 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
-.env.example
+/.env.example
 DEPLOYMENT_GUIDE.md
 SEPARATE_DEPLOYMENT_GUIDE.md
 TODO.md
