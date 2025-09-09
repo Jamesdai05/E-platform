@@ -52,7 +52,7 @@ const OrderPage = () => {
                         value: {
                             "client-id": paypal.clientId,
                             currency: "USD",
-                            intent: "capture",
+                            // intent: "capture",
                         },
                     });
                     paypalDispatch({

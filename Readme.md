@@ -72,7 +72,7 @@ The technologies applied in this project are:
 
 ## Future development
 
-- Add more payment methods
+- Add more payment methods(currently only support paypal and credit card)
 - Add product sorting by category
 - Add the user password recovery
 - Add the product filtering by price
