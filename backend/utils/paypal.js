@@ -19,26 +19,6 @@ function validatePayPalEnvironmentVariables() {
 
 Missing variables: ${missingVars.join(', ')}
 
-🔧 To fix this issue:
-
-1. In your Render dashboard:
-   - Go to your service settings
-   - Navigate to "Environment" tab
-   - Add the following environment variables:
-
-   PAYPAL_CLIENT_ID=your_paypal_client_id_here
-   PAYPAL_APP_SECRET=your_paypal_app_secret_here
-   PAYPAL_API_URL=https://api-m.sandbox.paypal.com (for sandbox)
-   PAYPAL_API_URL=https://api-m.paypal.com (for production)
-
-2. Get your PayPal credentials from:
-   - Visit: https://developer.paypal.com/developer/applications/
-   - Create or select your application
-   - Copy the Client ID and Client Secret
-
-3. After adding the variables, redeploy your service in Render
-
-📚 For detailed instructions, see RENDER_DEPLOYMENT.md
     `.trim();
 
     throw new Error(errorMessage);
