@@ -62,7 +62,7 @@ export const usersApiSlice=apiSlice.injectEndpoints({
         body: data,
       }),
       invalidatesTags: ["USER"],
-      keepUnusedDataFor: 5,-
+      keepUnusedDataFor: 5,
     })
   }),
 });
