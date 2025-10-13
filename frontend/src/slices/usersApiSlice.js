@@ -1,6 +1,25 @@
 import { USERS_URL } from "../constants.js";
 import { apiSlice } from "./apiSlice.js";
 
+/**
+ * @typedef {Object} UsersApiSlice
+ * @description Redux API slice for handling user-related operations
+ *
+ * @property {Object} endpoints Collection of API endpoints
+ * @property {Object} login.mutation Authenticates user login
+ * @property {Object} registration.mutation Registers new user
+ * @property {Object} logout.mutation Handles user logout
+ * @property {Object} updateprofile.mutation Updates user profile
+ * @property {Object} getUsers.query Retrieves list of all users
+ * @property {Object} deleteUser.mutation Deletes a user by ID
+ * @property {Object} getUserDetails.query Gets details of specific user
+ * @property {Object} updateUser.mutation Updates user information
+ *
+ * @remarks
+ * - Uses RTK Query for API calls
+ * - Implements caching with provideTags and invalidateTags
+ * - Keeps unused data for 5 seconds in relevant queries
+ */
 export const usersApiSlice=apiSlice.injectEndpoints({
   endpoints:(builder)=>({
     login:builder.mutation({
