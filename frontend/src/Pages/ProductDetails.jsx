@@ -62,6 +62,8 @@ const ProductDetails = () => {
     } catch (error) {
       console.log(error?.error)
       toast.error(error?.data?.message || error?.error)
+      setRating(0);
+      setComment("")
     }
   }
 
