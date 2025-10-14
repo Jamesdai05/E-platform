@@ -16,7 +16,7 @@ dotenv.config()
 // Validate critical environment variables on startup
 function validateEnvironmentVariables() {
   const requiredVars = {
-    'MONGO_URI': process.env.MONGO_URI,
+    'MONGO_URI': process.env.MONGO_URI || process.env.MONGO_URI_LOCAL,
     'JWT_SECRET': process.env.JWT_SECRET,
     'NODE_ENV': process.env.NODE_ENV,
   };
