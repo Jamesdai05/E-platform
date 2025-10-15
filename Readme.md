@@ -50,6 +50,8 @@ The technologies applied in this project are:
 
 &nbsp;Database seeding
 
+&nbsp;Frontend lazy loading to improve the performance
+
 &nbsp;Web hosting
 
 ## Project Link
