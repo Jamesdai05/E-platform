@@ -1,9 +1,10 @@
 // import { useState } from "react";
-import { Carousel, Image } from "react-bootstrap";
+import { Carousel } from "react-bootstrap";
 // import { useGetTopProductsQuery } from "../slices/productsSlice.js";
 // import Loader from "./Loader.jsx";
 // import Message from "./Message.jsx";
 import { Link } from "react-router-dom";
+import LazyImage from "./LazyImage";
 
 export const ProductCarousel = ({products}) => {
   // const { data: products, isLoading, error } = useGetTopProductsQuery();
@@ -24,11 +25,12 @@ export const ProductCarousel = ({products}) => {
           {products.map((product) => (
             <Carousel.Item key={product._id}>
               <Link to={`/product/${product._id}`}>
-                <Image
+                <LazyImage
                   src={product.image}
-                  text="top product"
-                  alt="product"
+                  alt={product.name}
                   style={style}
+                  className="carousel-image"
+                  variant="top"
                 />
                 <Carousel.Caption className="carousel-caption">
                   <h3>

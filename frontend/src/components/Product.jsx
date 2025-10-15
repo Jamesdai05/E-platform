@@ -1,14 +1,16 @@
 import { Card } from "react-bootstrap";
 import Rating from "./Rating";
 import { Link } from "react-router-dom";
+import LazyImage from "./LazyImage";
 
 const Product = ({ name, rating, numReviews, price,image,_id}) => {
   return (
     <Card className="my-3 p-1 rounded">
       <Link to={`/product/${_id}`}>
-        <Card.Img
+        <LazyImage
           variant="top"
           src={image}
+          alt={name}
           style={{ height: "15rem", objectFit: "contain" }}
         />
       </Link>
