@@ -7,6 +7,7 @@ const LazyImage = ({ src, alt, style, className, variant = "top" }) => {
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef(null);
 
+//   for resetting the states when image src changes.
   useEffect(() => {
     // Reset states when src changes
     setIsLoaded(false);
