@@ -10,12 +10,12 @@ export const ProductCarousel = ({products}) => {
   // const { data: products, isLoading, error } = useGetTopProductsQuery();
 
   const style = {
-    width: "800px",
+    width: "100%",
     height: "520px",
     objectFit: "contain",
     display: "flex",
     justifyContent: "center",
-    margin: "auto",
+    margin: "0 auto",
   };
   return (
     <>

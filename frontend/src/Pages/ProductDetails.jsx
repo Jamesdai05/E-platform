@@ -1,9 +1,10 @@
-import { Col, Image, ListGroup, Row,Button,Card,Form } from 'react-bootstrap';
+import { Col, ListGroup, Row,Button,Card,Form } from 'react-bootstrap';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Rating from '../components/Rating.jsx';
 import { useCreateReviewMutation, useGetProductDetailsQuery } from '../slices/productsSlice.js';
 import Loader from '../components/Loader.jsx';
 import Message from '../components/Message.jsx';
+import LazyImage from '../components/LazyImage.jsx';
 import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from '../slices/cartSlice.js';
@@ -81,7 +82,12 @@ const ProductDetails = () => {
         <>
           <Row>
             <Col md={5}>
-              <Image src={product.image} alt={product.name} fluid />
+              <LazyImage 
+                src={product.image} 
+                alt={product.name} 
+                style={{ width: '100%', height: 'auto' }}
+                className="img-fluid"
+              />
             </Col>
             <Col md={4}>
               <ListGroup variant="flush">
