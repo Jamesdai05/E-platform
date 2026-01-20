@@ -25,7 +25,7 @@ const protectRoute=asyncHandler(
     }
   }else{
     res.status(401);
-    throw new Error("Unauthorized login,no token")
+    throw new Error("Unauthorized login,no token" || "Please log in first!")
   }
 })
 
