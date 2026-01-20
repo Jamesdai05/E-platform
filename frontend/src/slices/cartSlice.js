@@ -1,8 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { updateCart } from "../utils/cartUtils.js";
 
+const getCartFromStorage =()=>{
+    if(typeof window !== "undefined"){
+        const cart=localStorage.getItem("cart")
+        return cart ? JSON.parse(cart) : {cartItems:[],shippingAddress:{},paymentMethod:"PayPal"}
+    }
+}
+
 // set the initialState to  the browser memory or to be an empty array
-const initialState=localStorage.getItem("cart") ? JSON.parse(localStorage.getItem('cart')) : {cartItems:[],shippingAddress:{},paymentMethod:"PayPal"}
+const initialState=getCartFromStorage()
 
 // console.log(initialState);
 
@@ -40,7 +47,7 @@ const cartSlice=createSlice({
         return updateCart(state)
       },
       resetCart:(state)=>{
-        state=initialState
+        return getCartFromStorage()
       }
     }
 })

@@ -61,7 +61,7 @@ const ProductDetails = () => {
       setComment("")
 
     } catch (error) {
-      console.log(error?.error)
+      console.log(error?.data?.message);
       toast.error(error?.data?.message || error?.error)
       setRating(0);
       setComment("")
@@ -82,9 +82,9 @@ const ProductDetails = () => {
         <>
           <Row>
             <Col md={5}>
-              <LazyImage 
-                src={product.image} 
-                alt={product.name} 
+              <LazyImage
+                src={product.image}
+                alt={product.name}
                 style={{ width: '100%', height: 'auto' }}
                 className="img-fluid"
               />
@@ -169,11 +169,11 @@ const ProductDetails = () => {
           <Row className="review my-4">
             <Col md={6}>
               <h3>Reviews</h3>
-              {product.reviews.length === 0 && (
+              {product.reviews?.length === 0 && (
                 <Message>No review yet.</Message>
               )}
               <ListGroup variant="flush">
-                {product.reviews.map((review) => (
+                {product.reviews?.map((review) => (
                   <ListGroup.Item key={review._id}>
                     <b>{review.name}</b>
                     <Rating value={review.rating} />
