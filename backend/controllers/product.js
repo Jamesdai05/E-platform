@@ -40,9 +40,7 @@ const getProductsById=asyncHandler(async(req,res)=>{
   // }
 
   const product = await Product.findById(productId)
-  if(product){
-    return res.json(product);
-  }
+
   res.status(404).json({message:"Product not found."})
 })
 

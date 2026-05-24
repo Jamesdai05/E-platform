@@ -43,7 +43,7 @@ const deleteData =async()=>{
     console.log("data deleted!");
     process.exit();
   }catch(err){
-    console.log(`${err}`);
+    console.log(`Error:${err.message}`);
     process.exit(1)
   }
 }
