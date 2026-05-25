@@ -96,6 +96,11 @@ app.get("/api/config/paypal",(req,res)=>
   res.send({clientId: process.env.PAYPAL_CLIENT_ID})
 );
 
+//  to ping the uptimeRobot
+app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "OK" });
+});
+
 // serve static files
 const __dirname=path.resolve();// set __dirname to current directory
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
