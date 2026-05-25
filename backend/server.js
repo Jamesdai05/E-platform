@@ -83,9 +83,9 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cookieParser())
 
-//get products
-// app.get("/api/products",(req,res)=>{
-//   res.json(products)
+// get products
+// app.get("/",(req,res)=>{
+//   res.json({message:"Hello welcome to E-shop"})
 // })
 app.use("/api/products",productRoutes);
 app.use("/api/users",userRoutes);
