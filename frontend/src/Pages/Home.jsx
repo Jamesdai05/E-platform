@@ -47,11 +47,11 @@ const Home = () => {
   // console.log(data)
   // combined loading state
 //   const isLoading = isLoadingProducts || isLoadingCarousel;
-  const style = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  };
+//   const style = {
+//     display: "flex",
+//     justifyContent: "center",
+//     alignItems: "center",
+//   };
 //   console.log("carouselData:", carouselData)
   return (
         <>
@@ -59,38 +59,39 @@ const Home = () => {
             {!isLoadingCarousel && !carouselError && !keyword && (
                 <ProductCarousel products={carouselData || []} />)
             }
-            <h1>Latest Products</h1>
-                <Row>
-                    {/* left:filter */}
-                    <Col xs={12} md={3} lg={2} className="mb-2">
-                        <ProductFilter
-                            key={`${minPrice}-${maxPrice}`}
-                            minPrice={minPrice}
-                            maxPrice={maxPrice}
-                            onApply={applyFilter}
-                            onReset={resetFilter}
-                        />
-                    </Col>
-                    {/* Right:Prodcuts  */}
-                    <Col xs={12} md={9} lg={10}>
-                        {
-                            isLoadingProducts ?
-                            (<Loader />):
-                                productError ? (
-                                <Message>{productError?.data?.message ||productError?.error}</Message>
-                            ) : (
-                                <>
-                                    <Productlist products={data.products} style={style} />
-                                    <Paginate
-                                        pages={data.pages}
-                                        page={data.page}
-                                        keyword={keyword ? keyword : ""}
-                                    />
-                                </>
-                            )
-                        }
-                    </Col>
-                </Row>
+
+            <Row>
+                {/* left:filter */}
+                <Col md={4} lg={3} xl={2} className="mb-3">
+                    <ProductFilter
+                        key={`${minPrice}-${maxPrice}`}
+                        minPrice={minPrice}
+                        maxPrice={maxPrice}
+                        onApply={applyFilter}
+                        onReset={resetFilter}
+                    />
+                </Col>
+                {/* Right:Prodcuts  */}
+                <Col md={8} lg={9} xl={10}>
+                    <h1>Latest Products</h1>
+                    {
+                        isLoadingProducts ?
+                        (<Loader />):
+                            productError ? (
+                            <Message>{productError?.data?.message ||productError?.error}</Message>
+                        ) : (
+                            <>
+                                <Productlist products={data.products} />
+                                <Paginate
+                                    pages={data.pages}
+                                    page={data.page}
+                                    keyword={keyword ? keyword : ""}
+                                />
+                            </>
+                        )
+                    }
+                </Col>
+            </Row>
       </>
   );
 };
