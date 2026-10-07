@@ -30,7 +30,7 @@ const Home = () => {
         if(minPrice) next.set("minPrice",minPrice);
         if(maxPrice) next.set("maxPrice",maxPrice);
 
-        navigate({path:basePath,search:next.toString()})  // to set the search to from number to string
+        navigate({pathname:basePath,search:next.toString()})  // to set the search to from number to string
     }
 
     const resetFilter=()=>navigate(basePath);
@@ -94,5 +94,6 @@ const Home = () => {
       </>
   );
 };
+
 
 export default Home;

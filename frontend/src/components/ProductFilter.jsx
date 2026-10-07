@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { Range } from "react-range";
+import { Range,getTrackBackground } from "react-range";
 
 
 const ProductFilter = ({onApply,onReset}) => {
@@ -43,7 +43,13 @@ const ProductFilter = ({onApply,onReset}) => {
                         ...props.style,
                         height: "6px",
                         width: "100%",
-                        backgroundColor:"#ddd",
+                        background:getTrackBackground(
+                            {
+                                values,
+                                colors:["#ddd","#0d6efd","#ddd"],
+                                min:0,
+                                max:1000,
+                            }),
                     }}>
                         {children}
                     </div>
@@ -66,7 +72,7 @@ const ProductFilter = ({onApply,onReset}) => {
 
             <div className="d-grid gap-2 mt-4">
                 <Button type="submit">Apply</Button>
-                <Button type="button" onClick={reset}>Reset</Button>
+                <Button type="button" variant="outline-secondary" onClick={reset}>Reset</Button>
             </div>
         </Form>
     )
