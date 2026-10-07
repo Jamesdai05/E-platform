@@ -7,7 +7,8 @@ import {
   updateProductsById,
   deleteProductsById,
   createProductReview,
-  getTopProducts,
+    getTopProducts,
+  getProductsByPrices
 } from '../controllers/product.js';
 import { admin, protectRoute } from '../middleware/authMiddleware.js';
 
@@ -16,9 +17,10 @@ import { admin, protectRoute } from '../middleware/authMiddleware.js';
 const router=express.Router()
 // router.route("/").get(getProducts).post(protectRoute,admin,createProduct);
 router.route("/").get(getProductsWithPagination).post(protectRoute,admin,createProduct);
-router.get("/top",getTopProducts);
+router.get("/top", getTopProducts);
+router.get("/price", getProductsByPrices);
 router.route("/:id").get(getProductsById).put(protectRoute,admin,updateProductsById).delete(deleteProductsById);
-router.route("/:id/reviews").post(protectRoute,createProductReview);
+router.route("/:id/reviews").post(protectRoute, createProductReview);
 
 
 export default router;
