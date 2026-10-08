@@ -187,24 +187,27 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
     if (
         Number.isNaN(min) ||
         (max !== undefined && Number.isNaN(max)) ||
-        (min < 0) ||
-        (max < 0) ||
+        min < 0 ||
+        max < 0 ||
         (min > max)
     ) {
-        return res.status(400).json({
-            message: "Invalid price range."
-        });
+        res.status(400);
+        throw new Error("Invalid price range!");
     }
 
+
+
     const query = { price: { $gte: min } };  // to find the product that price is greater or equal to min
+
+    const count = await Product.countDocuments(query);
     if (max !== undefined) query.price.$lte = max;  //the max price will be less than the max and equal to max figure.
 
-    const filteredProducts = await Product.find(query)
+    const products = await Product.find(query)
         .sort({ price: 1 })
         .limit(pageSize)
         .skip(pageSize * (page-1));
 
-    res.json({ filteredProducts,page,pages:Math.ceil(count / pageSize)});
+    res.json({ products,page,pages:Math.ceil(count / pageSize)});
 });
 
 
