@@ -65,7 +65,7 @@ const Home = () => {
                 <ProductCarousel products={carouselData || []} />)
             }
 
-            <Row className="pt-4">
+            <Row>
                 {/* left:filter */}
                 <Col md={4} lg={3} xl={2} className="mt-3">
                     <ProductFilter

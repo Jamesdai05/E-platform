@@ -74,6 +74,8 @@ The technologies applied in this project are:
 
   &nbsp; Authorization and Authentication
 
+  &nbsp; Filtering for products
+
 ## Future development
 
 - Add more payment methods(currently only support paypal and credit card)
