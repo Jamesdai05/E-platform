@@ -5,7 +5,7 @@ import { apiSlice } from "./apiSlice.js";
 export const productsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getProducts: builder.query({
-            query: ({ keyword, pageNumber }) => ({
+            query: ({ keyword, pageNumber}) => ({
                 url: PRODUCTS_URL,
                 params: {
                     keyword,
@@ -67,8 +67,9 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         }),
 
         getProductsByPrices: builder.query({
-            query: () => ({
+            query: ({minPrice,maxPrice}) => ({
                 url: `${PRODUCTS_URL}/price`,
+                params:{minPrice,maxPrice},
             }),
             keepUnusedDataFor: 5,
             providesTags: ['Product'],

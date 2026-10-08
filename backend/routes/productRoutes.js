@@ -19,7 +19,7 @@ const router=express.Router()
 router.route("/").get(getProductsWithPagination).post(protectRoute,admin,createProduct);
 router.get("/top", getTopProducts);
 router.get("/price", getProductsByPrices);
-router.route("/:id").get(getProductsById).put(protectRoute,admin,updateProductsById).delete(deleteProductsById);
+router.route("/:id").get(getProductsById).put(protectRoute,admin,updateProductsById).delete(protectRoute,admin,deleteProductsById);
 router.route("/:id/reviews").post(protectRoute, createProductReview);
 
 

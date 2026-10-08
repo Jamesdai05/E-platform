@@ -40,8 +40,10 @@ const getProductsById = asyncHandler(async (req, res) => {
     // }
 
     const product = await Product.findById(productId);
-
-    res.status(404).json({ message: "Product not found." });
+    if (!product) {
+        return res.status(404).json({ message: "Product not found." });
+    }
+    res.status(200).json(product);
 });
 
 // @desc   create a single product
@@ -181,11 +183,11 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
     const max = maxPrice !==undefined ? Number(maxPrice) : undefined;
 
     if (
-        (min !== undefined && Number.isNaN(min)) ||
+        Number.isNaN(min) ||
         (max !== undefined && Number.isNaN(max)) ||
-        (min !== undefined && min < 0) ||
-        (max !== undefined && max < 0) ||
-        (min !== undefined && max !== undefined && min > max)
+        (min < 0) ||
+        (max < 0) ||
+        (min > max)
     ) {
         return res.status(400).json({
             message: "Invalid price range."
@@ -195,7 +197,7 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
     const query = { price: { $gte: min } };  // to find the product that price is greater or equal to min
     if (max !== undefined) query.price.$lte = max;  //the max price will be less than the max and equal to max figure.
 
-    const filteredProducts = await Product.find(query).sort({price:-1});
+    const filteredProducts = await Product.find(query).sort({price:1});
 
     res.json(filteredProducts);
 });

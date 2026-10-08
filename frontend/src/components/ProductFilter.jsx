@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { Range,getTrackBackground } from "react-range";
+import { Range, getTrackBackground } from "react-range";
+
+const MIN = 0;
+const MAX = 1000;
+const step = 10;
 
 
 const ProductFilter = ({onApply,onReset}) => {
