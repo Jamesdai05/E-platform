@@ -178,9 +178,11 @@ const getTopProducts = asyncHandler(async (req, res) => {
 
 const getProductsByPrices = asyncHandler(async (req, res) => {
     const { minPrice, maxPrice } = req.query;
+    const pageSize = 8;
+    const page = Number(req.query.pageNumber) || 1;
 
-    const min = minPrice !==undefined ? Number(minPrice) : 0;
-    const max = maxPrice !==undefined ? Number(maxPrice) : undefined;
+    const min = minPrice  ? Number(minPrice) : 0;
+    const max = maxPrice  ? Number(maxPrice) : undefined;
 
     if (
         Number.isNaN(min) ||
@@ -197,9 +199,12 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
     const query = { price: { $gte: min } };  // to find the product that price is greater or equal to min
     if (max !== undefined) query.price.$lte = max;  //the max price will be less than the max and equal to max figure.
 
-    const filteredProducts = await Product.find(query).sort({price:1});
+    const filteredProducts = await Product.find(query)
+        .sort({ price: 1 })
+        .limit(pageSize)
+        .skip(pageSize * (page-1));
 
-    res.json(filteredProducts);
+    res.json({ filteredProducts,page,pages:Math.ceil(count / pageSize)});
 });
 
 

@@ -1,7 +1,7 @@
 // import { useEffect, useState } from "react";
 import Loader from "../components/Loader.jsx";
 import Productlist from "../components/Productlist.jsx";
-import { useGetProductsQuery, useGetTopProductsQuery } from "../slices/productsSlice.js";
+import { useGetProductsQuery, useGetTopProductsQuery, useGetProductsByPricesQuery } from "../slices/productsSlice.js";
 // import products from "../products";
 // import axios from 'axios';
 import Message from "../components/Message.jsx";
@@ -25,35 +25,40 @@ const Home = () => {
     const basePath = keyword ? `/search/${keyword}` : "/";
 
     // go back to page 1 wheneven the filter is changed
-    const applyFilter=({minPrice,maxPrice})=>{
-        const next=new URLSearchParams();
-        if(minPrice) next.set("minPrice",minPrice);
-        if(maxPrice) next.set("maxPrice",maxPrice);
+    const applyFilter = ({ minPrice, maxPrice }) => {
+        const next = new URLSearchParams();
+        if (minPrice) next.set("minPrice", minPrice);
+        if (maxPrice) next.set("maxPrice", maxPrice);
 
-        navigate({pathname:basePath,search:next.toString()})  // to set the search to from number to string
-    }
+        navigate({ pathname: basePath, search: next.toString() });  // to set the search to from number to string
+    };
 
-    const resetFilter=()=>navigate(basePath);
+    const resetFilter = () => navigate(basePath);
 
+    const isPriceFiltered = minPrice !== undefined || maxPrice !== undefined; // to test whether the price query param is defined
 
-  // const { data: products, isLoading, error } = useGetProductsQuery();
-  const { data, isLoading:isLoadingProducts, error:productError } = useGetProductsQuery({keyword,pageNumber,minPrice,maxPrice});
-  // carousel products
-  const {
-      data: carouselData,
-      isLoading: isLoadingCarousel,
-      error: carouselError ,
- } = useGetTopProductsQuery();
-  // console.log(data)
-  // combined loading state
-//   const isLoading = isLoadingProducts || isLoadingCarousel;
-//   const style = {
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//   };
-//   console.log("carouselData:", carouselData)
-  return (
+    const listQuery=useGetProductsQuery({keyword,pageNumber},{skip:isPriceFiltered})
+
+    const priceQuery = useGetProductsByPricesQuery({ minPrice, maxPrice,pageNumber }, {skip: !isPriceFiltered })
+
+    // const { data: products, isLoading, error } = useGetProductsQuery();
+    const { data, isLoading: isLoadingProducts, error: productError } = isPriceFiltered ? priceQuery : listQuery;
+    // carousel products
+    const {
+        data: carouselData,
+        isLoading: isLoadingCarousel,
+        error: carouselError,
+    } = useGetTopProductsQuery();
+    // console.log(data)
+    // combined loading state
+    //   const isLoading = isLoadingProducts || isLoadingCarousel;
+    //   const style = {
+    //     display: "flex",
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //   };
+    //   console.log("carouselData:", carouselData)
+    return (
         <>
             {/* carousel stays full width above the two columns */}
             {!isLoadingCarousel && !carouselError && !keyword && (
@@ -76,24 +81,24 @@ const Home = () => {
                     <h1>Latest Products</h1>
                     {
                         isLoadingProducts ?
-                        (<Loader />):
+                            (<Loader />) :
                             productError ? (
-                            <Message>{productError?.data?.message ||productError?.error}</Message>
-                        ) : (
-                            <>
-                                <Productlist products={data.products} />
-                                <Paginate
-                                    pages={data.pages}
-                                    page={data.page}
-                                    keyword={keyword ? keyword : ""}
-                                />
-                            </>
-                        )
+                                <Message>{productError?.data?.message || productError?.error}</Message>
+                            ) : (
+                                <>
+                                    <Productlist products={data.products} />
+                                    <Paginate
+                                        pages={data.pages}
+                                        page={data.page}
+                                        keyword={keyword ? keyword : ""}
+                                    />
+                                </>
+                            )
                     }
                 </Col>
             </Row>
-      </>
-  );
+        </>
+    );
 };
 
 
