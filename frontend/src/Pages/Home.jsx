@@ -77,7 +77,7 @@ const Home = () => {
                     />
                 </Col>
                 {/* Right:Prodcuts  */}
-                <Col md={8} lg={9} xl={10}>
+                <Col md={8} lg={9} xl={10} className="mt-3">
                     <h1>Latest Products</h1>
                     {
                         isLoadingProducts ?
