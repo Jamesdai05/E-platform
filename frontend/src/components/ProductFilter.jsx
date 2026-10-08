@@ -26,7 +26,7 @@ const ProductFilter = ({onApply,onReset}) => {
 
 
     return (
-        <Form onSubmit={submit} className="p-3 border rounded">
+        <Form onSubmit={submit} className="p-3 border rounded mt-3">
             <h5>Filter By Price</h5>
 
             <div className="mb-3">

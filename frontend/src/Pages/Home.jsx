@@ -65,9 +65,9 @@ const Home = () => {
                 <ProductCarousel products={carouselData || []} />)
             }
 
-            <Row>
+            <Row className="pt-4">
                 {/* left:filter */}
-                <Col md={4} lg={3} xl={2} className="mb-3">
+                <Col md={4} lg={3} xl={2} className="mt-3">
                     <ProductFilter
                         key={`${minPrice}-${maxPrice}`}
                         minPrice={minPrice}
