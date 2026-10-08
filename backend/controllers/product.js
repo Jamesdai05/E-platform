@@ -1,6 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Product from "../models/productModel.js";
-import mongoose from "mongoose";
+
 
 // @desc   fetch all products
 // @route  GET /api/products
@@ -16,8 +16,10 @@ const getProductsWithPagination = asyncHandler(async (req, res) => {
     const pageSize = 8;
     const page = Number(req.query.pageNumber) || 1; //the page number will be query number or the default 1.
 
+    const escapeRegex = text => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     // to match the keyword with not casesensitive match, if no keyword then just be blank
-    const keyword = req.query.keyword ? { name: { $regex: req.query.keyword, $options: "i" } } : {};
+    const keyword = req.query.keyword ? { name: { $regex: escapeRegex(req.query.keyword), $options: "i" } } : {};
 
     const count = await Product.countDocuments({ ...keyword }); //for mongodb database
 
@@ -55,7 +57,6 @@ const createProduct = asyncHandler(async (req, res) => {
     const product = new Product({
         name: "Product",
         price: 0,
-        category: "sample category",
         user: req.user._id,
         image: "/images/sample.jpg",
         brand: "sample brand",
@@ -86,8 +87,8 @@ const updateProductsById = asyncHandler(async (req, res) => {
 
     if (product) {
         product.name = name;
-        product.price = price,
-            product.brand = brand;
+        product.price = price;
+        product.brand = brand;
         product.countInStock = countInStock;
         product.category = category;
         product.description = description;
@@ -112,7 +113,7 @@ const deleteProductsById = asyncHandler(async (req, res) => {
 
     if (product) {
         await Product.deleteOne({ _id: product._id });
-        return res.status(200).json({ message: "Product is deleted1" });
+        return res.status(200).json({ message: "Product is deleted!" });
     } else {
         res.status(404).json({ message: "Resource not found." });
     }
@@ -152,14 +153,14 @@ const createProductReview = asyncHandler(async (req, res) => {
         await product.save();
         res.status(201).json({ message: "Review submitted!" });
     } else {
-        res.status(400).json("Product not found.");
+        res.status(404).json("Product not found.");
     }
 });
 
 
 // @desc   Get top 3 product base on the rating.
 // @route  GET /api/products/top
-// @access Private
+// @access Public
 
 
 const getTopProducts = asyncHandler(async (req, res) => {
