@@ -7,6 +7,7 @@ import { useLogoutMutation } from "../slices/usersApiSlice.js";
 import { logout } from "../slices/authSlice.js";
 import SearchBox from "./SearchBox.jsx";
 import { resetCart } from "../slices/cartSlice.js";
+import { apiSlice } from "../slices/apiSlice.js";
 
 const Header = () => {
 
@@ -26,7 +27,9 @@ const Header = () => {
       // promise unwrap;
       await logoutApiCall().unwrap();
       dispatch(logout());
-      resetCart();
+      // Leave nothing behind for the next person on this browser
+      dispatch(resetCart());
+      dispatch(apiSlice.util.resetApiState());
       navigate("/login");
     }catch(err){
       console.log(err);
