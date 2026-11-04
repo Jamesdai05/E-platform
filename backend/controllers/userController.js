@@ -13,6 +13,12 @@ const authUser=asyncHandler(async(req,res)=>{
   // destructure the email and pwd
   const { email, password } = req.body
 
+  // Only plain strings: an object like {"$ne":""} would run as a database query
+  if(typeof email !== "string" || typeof password !== "string"){
+    res.status(401)
+    throw new Error("Invalid email or password!")
+  }
+
    const user = await User.findOne({ email });
   // console.log(user)
   if(user  && (await user.matchPassword(password) && !user.isDisabled)){
@@ -48,6 +54,11 @@ const authUser=asyncHandler(async(req,res)=>{
 const registrationOfUser=asyncHandler(async(req,res)=>{
   // res.send("register User!")
   const {email,name,password}=req.body;
+
+  if(typeof email !== "string" || typeof name !== "string" || typeof password !== "string"){
+    res.status(400);
+    throw new Error("Invalid user data!")
+  }
 
   const isUserExists=await User.findOne({email});
 
@@ -152,7 +163,7 @@ const updateUserProfile=asyncHandler(async(req,res)=>{
 // @access private/Admin
 
 const getUsers=asyncHandler(async(req,res)=>{
-  const users=await User.find({})
+  const users=await User.find({}).select("-password")
   res.status(200).json(users)
   // res.send("get users!")
 })
@@ -182,7 +193,7 @@ const deleteUserById=asyncHandler(async(req,res)=>{
   const user = await User.findById(req.params.id);
   if(user){
     if(user.isAdmin){
-      res.status(400).json("Cannot delete admin!")
+      return res.status(400).json({message:"Cannot delete admin!"})
     }
     await User.deleteOne({_id:user._id});
     return res.status(200).json({message:"User is deleted successfully!"})
@@ -205,7 +216,12 @@ const updateUserById=asyncHandler(async(req,res)=>{
     user.isAdmin = Boolean(req.body.isAdmin)
 
     const updatedUser = await user.save();
-    return res.status(201).json(updatedUser).select("-password");
+    return res.status(201).json({
+      _id:updatedUser._id,
+      name:updatedUser.name,
+      email:updatedUser.email,
+      isAdmin:updatedUser.isAdmin,
+    });
   }else{
     res.status(404).json("User not exist!");
   }

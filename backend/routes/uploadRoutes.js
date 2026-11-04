@@ -1,7 +1,9 @@
 import path from "path";
+import { randomUUID } from "crypto";
 import express from 'express';
 
 import multer from "multer";
+import { admin, protectRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 // set the storage for the file
@@ -10,8 +12,8 @@ const storage=multer.diskStorage({
     cb(null,"uploads/");  //null is for the error
   },
   filename(req,file,cb){
-    // cb(null,`${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    cb(null,`${Date.now()}-${file.originalname}`)
+    // A generated name, so nothing from the client ends up in the file path
+    cb(null,`${Date.now()}-${randomUUID()}${path.extname(file.originalname).toLowerCase()}`)
   },
 
 });
@@ -23,11 +25,9 @@ function fileFilter(req,file,cb){
   // if (!file || !file.originalname) {
   //   return cb(new Error('File is missing or invalid'), false);
   // }
-  const  filetypes = /jpe?g|png/;
   // console.log("file object",file);
-  console.log(file.originalname)
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
+  const extname = /^\.(jpe?g|png)$/.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = /^image\/(jpe?g|png)$/.test(file.mimetype);
 
 
   if(extname && mimetype){
@@ -38,18 +38,23 @@ function fileFilter(req,file,cb){
 }
 
 const upload=multer({
-  storage,fileFilter
+  storage,
+  fileFilter,
+  limits:{fileSize:5*1024*1024,files:1}, // 5MB
 })
 
 const uploadSingleImage=upload.single("image");
 
 // middleware for the single image uploading
 
-router.post("/", (req,res)=>{
-  console.log("Request received:", req.body)
+router.post("/", protectRoute, admin, (req,res)=>{
   uploadSingleImage(req,res,function(err){
     if (err) {
       return res.status(400).send({ message: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).send({ message: "No image file provided" });
     }
 
      res.status(200).send({

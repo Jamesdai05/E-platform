@@ -18,7 +18,7 @@ const Userlist = () => {
     // console.log("handle Deleting")
     if(window.confirm("Are you sure want to delete the user?")){
       try {
-        await deleteUser(id);
+        await deleteUser(id).unwrap();
         refetch();
         toast.success("User is deleted!", { position: "top-center" });
       } catch (error) {

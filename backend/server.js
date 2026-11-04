@@ -69,10 +69,12 @@ const app=express()
 
 const port =process.env.PORT || 5002
 
+// Render's proxy sits in front of the app, and req.ip must come from its header
+app.set('trust proxy', 1);
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? true // Allow same origin in production since frontend is served from same domain
-    : "http://localhost:3000",
+  // The frontend is served from this domain in production, so no other site needs access
+  origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:3000",
   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
