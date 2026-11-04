@@ -108,6 +108,8 @@ const OrderPage = () => {
                             currency_code: "USD",
                         },
                         description: `Order ${order._id}`,
+                        // The backend checks this to tie the payment to this order
+                        custom_id: order._id,
                     },
                 ],
                 intent: "CAPTURE",

@@ -1,6 +1,18 @@
 import dotenv from 'dotenv';
 dotenv.config();
-const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
+const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL, PAYPAL_MERCHANT_ID } = process.env;
+
+/**
+ * Checks that a client-supplied value has the shape of a PayPal order ID.
+ * Without this, values like "ABC123#1" reach the same PayPal order while looking
+ * like a new ID to the replay check.
+ *
+ * @param {*} id - The value sent by the client.
+ * @returns {boolean} True if the value is a well-formed PayPal order ID.
+ */
+export function isValidPayPalOrderId(id) {
+  return typeof id === 'string' && /^[A-Z0-9]{1,36}$/.test(id);
+}
 
 /**
  * Validates that all required PayPal environment variables are present
@@ -12,6 +24,7 @@ function validatePayPalEnvironmentVariables() {
   if (!PAYPAL_CLIENT_ID) missingVars.push('PAYPAL_CLIENT_ID');
   if (!PAYPAL_APP_SECRET) missingVars.push('PAYPAL_APP_SECRET');
   if (!PAYPAL_API_URL) missingVars.push('PAYPAL_API_URL');
+  if (!PAYPAL_MERCHANT_ID) missingVars.push('PAYPAL_MERCHANT_ID');
 
   if (missingVars.length > 0) {
     const errorMessage = `
@@ -106,7 +119,7 @@ export async function checkIfNewTransaction(orderModel, paypalTransactionId) {
  * @see {@link https://developer.paypal.com/docs/api/orders/v2/#orders_get}
  *
  * @param {string} paypalTransactionId - The PayPal transaction ID to be verified.
- * @returns {Promise<Object>} An object with properties 'verified' indicating if the payment is completed and 'value' indicating the payment amount.
+ * @returns {Promise<Object>} An object with 'verified' (payment is completed), 'id' (PayPal's own order ID), 'value' and 'currency' (payment amount), 'customId' (the shop order this payment was created for) and 'payeeVerified' (the money went to this merchant).
  * @throws {Error} If the request is not successful.
  *
  */
@@ -115,7 +128,7 @@ export async function verifyPayPalPayment(paypalTransactionId) {
     /* console.log('Verifying PayPal payment for transaction ID:', paypalTransactionId); */
 
     const accessToken = await getPayPalAccessToken();
-    const url = `${PAYPAL_API_URL}/v2/checkout/orders/${paypalTransactionId}`;
+    const url = `${PAYPAL_API_URL}/v2/checkout/orders/${encodeURIComponent(paypalTransactionId)}`;
 
     console.log('Making PayPal verification request to:', url);
 
@@ -136,7 +149,8 @@ export async function verifyPayPalPayment(paypalTransactionId) {
     console.log('PayPal verification response:', JSON.stringify(paypalData, null, 2));
 
     const isCompleted = paypalData.status === 'COMPLETED';
-    const paymentValue = paypalData.purchase_units?.[0]?.amount?.value;
+    const purchaseUnit = paypalData.purchase_units?.[0];
+    const paymentValue = purchaseUnit?.amount?.value;
 
     if (!paymentValue) {
       throw new Error('Payment amount not found in PayPal response');
@@ -146,7 +160,11 @@ export async function verifyPayPalPayment(paypalTransactionId) {
 
     return {
       verified: isCompleted,
+      id: paypalData.id,
       value: paymentValue,
+      currency: purchaseUnit.amount.currency_code,
+      customId: purchaseUnit.custom_id,
+      payeeVerified: purchaseUnit.payee?.merchant_id === PAYPAL_MERCHANT_ID,
     };
   } catch (error) {
     console.error('Error verifying PayPal payment:', error);

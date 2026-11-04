@@ -90,6 +90,17 @@ const orderSchema=mongoose.Schema({
 
 },{timestamps:true})
 
+// One PayPal transaction can only ever pay one order. Sparse skips unpaid orders.
+orderSchema.index({'paymentResult.id':1},{unique:true,sparse:true})
+
 
 const Order=mongoose.model('Order',orderSchema);
+
+// Index builds fail silently otherwise, e.g. if existing orders share a transaction ID
+Order.on('index',(err)=>{
+  if(err){
+    console.error('Order index build failed, duplicate payments are not blocked:',err.message);
+  }
+});
+
 export default Order;

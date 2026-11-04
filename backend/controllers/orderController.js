@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import Order from "../models/orderModel.js";
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
-import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
+import { verifyPayPalPayment, checkIfNewTransaction, isValidPayPalOrderId } from '../utils/paypal.js';
 
 
 //@desc   addItemToOrder
@@ -25,7 +25,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     // Validate order items structure
     const invalidItems = orderItems.filter(item =>
-      !item._id || !item.qty || item.qty <= 0 || !item.name
+      !item._id || !Number.isInteger(item.qty) || item.qty <= 0 || !item.name
     );
 
     if (invalidItems.length > 0) {
@@ -175,8 +175,8 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     // console.log('Payment details:', JSON.stringify(req.body, null, 2));
 
     // Validate request body
-    if (!req.body.id) {
-      return res.status(400).json({ message: 'PayPal transaction ID is required' });
+    if (!isValidPayPalOrderId(req.body.id)) {
+      return res.status(400).json({ message: 'A valid PayPal transaction ID is required' });
     }
 
     // Find the order first
@@ -193,26 +193,36 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     }
 
     // Verify the payment with PayPal
-    const { verified, value } = await verifyPayPalPayment(req.body.id);
-    if (!verified) {
+    const payment = await verifyPayPalPayment(req.body.id);
+    if (!payment.verified) {
       return res.status(400).json({ message: 'Payment not verified with PayPal' });
     }
 
-    // Check if this transaction has been used before
-    const isNewTransaction = await checkIfNewTransaction(Order, req.body.id);
+    // The payment must have been created for this order and paid to this shop
+    if (payment.customId !== order._id.toString()) {
+      return res.status(400).json({ message: 'Payment does not belong to this order' });
+    }
+    if (!payment.payeeVerified) {
+      return res.status(400).json({ message: 'Payment was not made to this merchant' });
+    }
+
+    // Check if this transaction has been used before, using PayPal's own ID
+    const isNewTransaction = await checkIfNewTransaction(Order, payment.id);
     if (!isNewTransaction) {
       return res.status(400).json({ message: 'Transaction has been used before' });
     }
 
-    // Check the correct amount was paid (with floating point tolerance)
+    // Check the correct amount was paid, in whole cents to avoid floating point errors
+    if (payment.currency !== 'USD') {
+      return res.status(400).json({ message: `Incorrect currency paid: ${payment.currency}` });
+    }
+
     const orderAmount = parseFloat(order.totalPrice.toString());
-    const paidAmount = parseFloat(value);
-    const tolerance = 0.01; // 1 cent tolerance for floating point precision
+    const paidAmount = parseFloat(payment.value);
 
-    console.log(`Amount comparison: Order=${orderAmount}, Paid=${paidAmount}, Difference=${Math.abs(orderAmount - paidAmount)}`);
+    console.log(`Amount comparison: Order=${orderAmount}, Paid=${paidAmount}`);
 
-    const paidCorrectAmount = Math.abs(orderAmount - paidAmount) <= tolerance;
-    if (!paidCorrectAmount) {
+    if (Math.round(orderAmount * 100) !== Math.round(paidAmount * 100)) {
       return res.status(400).json({
         message: `Incorrect amount paid. Expected: $${orderAmount}, Received: $${paidAmount}`
       });
@@ -222,7 +232,7 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {
-      id: req.body.id,
+      id: payment.id,
       status: req.body.status || 'COMPLETED',
       update_time: req.body.update_time || new Date().toISOString(),
       email_address: req.body.payer?.email_address || 'N/A',
@@ -233,6 +243,11 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
 
     res.json(updatedOrder);
   } catch (error) {
+    // Unique index on paymentResult.id: another request used this transaction first
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Transaction has been used before' });
+    }
+
     console.error('Error processing payment:', error);
     res.status(500).json({
       message: error.message || 'Error processing payment',
