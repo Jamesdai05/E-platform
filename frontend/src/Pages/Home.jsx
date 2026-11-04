@@ -39,7 +39,7 @@ const Home = () => {
 
     const listQuery=useGetProductsQuery({keyword,pageNumber},{skip:isPriceFiltered})
 
-    const priceQuery = useGetProductsByPricesQuery({ minPrice, maxPrice,pageNumber }, {skip: !isPriceFiltered })
+    const priceQuery = useGetProductsByPricesQuery({ keyword, minPrice, maxPrice, pageNumber }, {skip: !isPriceFiltered })
 
     // const { data: products, isLoading, error } = useGetProductsQuery();
     const { data, isLoading: isLoadingProducts, error: productError } = isPriceFiltered ? priceQuery : listQuery;

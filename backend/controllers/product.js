@@ -10,6 +10,15 @@ const getPageNumber = (value) => {
 };
 
 
+// Builds the name search, shared by the product list and the price filter.
+// A repeated ?keyword= arrives as an array, which is treated as no search.
+const getKeywordFilter = (keyword) => {
+    if (typeof keyword !== "string" || !keyword) return {};
+
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return { name: { $regex: escaped, $options: "i" } }; // not case sensitive
+};
+
 // @desc   fetch all products
 // @route  GET /api/products
 // @access public
@@ -24,10 +33,7 @@ const getProductsWithPagination = asyncHandler(async (req, res) => {
     const pageSize = 8;
     const page = getPageNumber(req.query.pageNumber); //the page number will be query number or the default 1.
 
-    const escapeRegex = text => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    // to match the keyword with not casesensitive match, if no keyword then just be blank
-    const keyword = req.query.keyword ? { name: { $regex: escapeRegex(req.query.keyword), $options: "i" } } : {};
+    const keyword = getKeywordFilter(req.query.keyword);
 
     const count = await Product.countDocuments({ ...keyword }); //for mongodb database
 
@@ -205,7 +211,7 @@ const getTopProducts = asyncHandler(async (req, res) => {
 });
 
 // @desc Get the products based on the price range.
-// @route GET /api/products?minPrice=50&maxPrice=200
+// @route GET /api/products/price?keyword=shoe&minPrice=50&maxPrice=200
 // @access Public
 
 
@@ -230,7 +236,8 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
 
 
 
-    const query = { price: { $gte: min } };  // to find the product that price is greater or equal to min
+    // to find the product that price is greater or equal to min, within any search
+    const query = { ...getKeywordFilter(req.query.keyword), price: { $gte: min } };
 
     if (max !== undefined) query.price.$lte = max;  //the max price will be less than the max and equal to max figure.
 

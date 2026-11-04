@@ -67,9 +67,9 @@ export const productsApiSlice = apiSlice.injectEndpoints({
         }),
 
         getProductsByPrices: builder.query({
-            query: ({minPrice,maxPrice,pageNumber}) => ({
+            query: ({keyword,minPrice,maxPrice,pageNumber}) => ({
                 url: `${PRODUCTS_URL}/price`,
-                params:{minPrice,maxPrice,pageNumber},
+                params:{keyword,minPrice,maxPrice,pageNumber},
             }),
             keepUnusedDataFor: 5,
             providesTags: ['Product'],
