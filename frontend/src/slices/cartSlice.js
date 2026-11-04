@@ -1,12 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { updateCart } from "../utils/cartUtils.js";
 
+const emptyCart = {
+  cartItems: [],
+  shippingAddress: {},
+  paymentMethod: "Paypal",
+};
+
 const getCartFromStorage =()=>{
-    if(typeof window !== "undefined"){
+    try{
         const cart=localStorage.getItem("cart")
-        return cart ? JSON.parse(cart) : {cartItems:[],shippingAddress:{},paymentMethod:"PayPal"}
+      return cart ? JSON.parse(cart) : emptyCart;
+    } catch (e) {
+      console.error("Error loading cart", e);
+      return emptyCart;
     }
 }
+
+// the empty cart, used for the first visit, reset and logout
+
 
 // set the initialState to  the browser memory or to be an empty array
 const initialState=getCartFromStorage()

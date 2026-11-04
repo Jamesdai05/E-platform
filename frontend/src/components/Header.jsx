@@ -30,7 +30,7 @@ const Header = () => {
       // Leave nothing behind for the next person on this browser
       dispatch(resetCart());
       dispatch(apiSlice.util.resetApiState());
-      navigate("/login");
+      navigate("/login",{replace:true});
     }catch(err){
       console.log(err);
     }
