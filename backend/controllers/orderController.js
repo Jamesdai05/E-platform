@@ -3,7 +3,12 @@ import mongoose from 'mongoose';
 import Order from "../models/orderModel.js";
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
-import { verifyPayPalPayment, checkIfNewTransaction, isValidPayPalOrderId } from '../utils/paypal.js';
+import { createPayPalOrder, getPayPalOrder, capturePayPalOrder } from '../utils/paypal.js';
+
+// Only the customer who placed an order, or an admin, may read or pay it.
+// order.user may be an id or a populated user, and is null if the user was deleted.
+const canAccessOrder = (order, user) =>
+  user.isAdmin || order.user?._id?.toString() === user._id.toString();
 
 
 //@desc   addItemToOrder
@@ -141,6 +146,9 @@ const getOrderById=asyncHandler(async(req,res)=>{
   // res.send("Get Orders BY ID")
   const order=await Order.findById(req.params.id).populate("user","name email")
   if(order){
+    if(!canAccessOrder(order,req.user)){
+      return res.status(403).json({message:"Not authorized to view this order"});
+    }
     return res.status(200).json(order);
   }else{
     res.status(404).json({message:"Order not found!"});
@@ -165,93 +173,136 @@ const updateOrderToDeliver=asyncHandler(async(req,res)=>{
 })
 
 
-// @desc   Update orders status (to be paid)
-// @route  PUT api/orders/:id/pay
-// @access private/Admin
-const updateOrderToPaid = asyncHandler(async (req, res) => {
+// Applies a PayPal order's capture to a shop order, marking it paid once the money
+// has really arrived. Returns "paid", "pending" (PayPal is still processing it) or
+// "failed" (no money was taken, so the customer can try again).
+const settlePayment = async (order, paypalOrder) => {
+  const capture = paypalOrder.purchase_units?.[0]?.payments?.captures?.[0];
+
+  if (capture?.status === 'PENDING') {
+    return 'pending';
+  }
+  if (capture?.status !== 'COMPLETED') {
+    return 'failed';
+  }
+
+  // Compare in whole cents to avoid floating point errors
+  const paidInFull =
+    capture.amount?.currency_code === 'USD' &&
+    Math.round(parseFloat(capture.amount.value) * 100) === Math.round(order.totalPrice * 100);
+
+  if (!paidInFull) {
+    console.error(`Captured amount does not match order ${order._id}:`, capture.amount);
+    return 'failed';
+  }
+
+  order.isPaid = true;
+  order.paidAt = Date.now();
+  order.paymentResult = {
+    id: paypalOrder.id,
+    status: capture.status,
+    update_time: capture.update_time,
+    email_address:
+      paypalOrder.payment_source?.paypal?.email_address ||
+      paypalOrder.payer?.email_address ||
+      'N/A',
+  };
+  await order.save();
+
+  return 'paid';
+};
+
+const PAYMENT_PENDING_MESSAGE =
+  'Your payment is being processed by PayPal. Please do not pay again.';
+
+// @desc   Start a PayPal payment for the saved order total
+// @route  POST api/orders/:id/paypal
+// @access private (order owner or admin)
+const createPayPalPayment = asyncHandler(async (req, res) => {
   try {
-    // To check the payment id and the details
-    // console.log('Processing payment for order:', req.params.id);
-    // console.log('Payment details:', JSON.stringify(req.body, null, 2));
-
-    // Validate request body
-    if (!isValidPayPalOrderId(req.body.id)) {
-      return res.status(400).json({ message: 'A valid PayPal transaction ID is required' });
-    }
-
-    // Find the order first
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // console.log('Order found:', order._id, 'Total:', order.totalPrice);
+    if (!canAccessOrder(order, req.user)) {
+      return res.status(403).json({ message: 'Not authorized to pay for this order' });
+    }
 
-    // Check if order is already paid
+    if (order.isPaid) {
+      return res.status(409).json({ message: 'Order is already paid' });
+    }
+
+    // An earlier attempt may have taken the money without the order being updated,
+    // so check it before letting the customer pay a second time.
+    if (order.paypalOrderId) {
+      const earlierAttempt = await getPayPalOrder(order.paypalOrderId);
+      const result = earlierAttempt ? await settlePayment(order, earlierAttempt) : 'failed';
+
+      if (result === 'paid') {
+        return res.status(409).json({ message: 'Order is already paid' });
+      }
+      if (result === 'pending') {
+        return res.status(409).json({ message: PAYMENT_PENDING_MESSAGE });
+      }
+    }
+
+    order.paypalOrderId = await createPayPalOrder(order);
+    await order.save();
+
+    res.status(201).json({ id: order.paypalOrderId });
+  } catch (error) {
+    console.error('Error creating PayPal payment:', error);
+    res.status(500).json({ message: 'Could not start the PayPal payment. Please try again.' });
+  }
+});
+
+// @desc   Capture the approved PayPal payment and mark the order as paid
+// @route  POST api/orders/:id/paypal/capture
+// @access private (order owner or admin)
+const capturePayPalPayment = asyncHandler(async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (!canAccessOrder(order, req.user)) {
+      return res.status(403).json({ message: 'Not authorized to pay for this order' });
+    }
+
     if (order.isPaid) {
       return res.status(400).json({ message: 'Order is already paid' });
     }
 
-    // Verify the payment with PayPal
-    const payment = await verifyPayPalPayment(req.body.id);
-    if (!payment.verified) {
-      return res.status(400).json({ message: 'Payment not verified with PayPal' });
+    // Only the payment this server created for this order can ever be captured
+    if (!order.paypalOrderId) {
+      return res.status(400).json({ message: 'No PayPal payment has been started for this order' });
     }
 
-    // The payment must have been created for this order and paid to this shop
-    if (payment.customId !== order._id.toString()) {
-      return res.status(400).json({ message: 'Payment does not belong to this order' });
+    const paypalOrder = await capturePayPalOrder(order.paypalOrderId);
+    const result = await settlePayment(order, paypalOrder);
+
+    if (result === 'paid') {
+      return res.json(order);
     }
-    if (!payment.payeeVerified) {
-      return res.status(400).json({ message: 'Payment was not made to this merchant' });
+    if (result === 'pending') {
+      return res.status(202).json({ message: PAYMENT_PENDING_MESSAGE });
     }
-
-    // Check if this transaction has been used before, using PayPal's own ID
-    const isNewTransaction = await checkIfNewTransaction(Order, payment.id);
-    if (!isNewTransaction) {
-      return res.status(400).json({ message: 'Transaction has been used before' });
-    }
-
-    // Check the correct amount was paid, in whole cents to avoid floating point errors
-    if (payment.currency !== 'USD') {
-      return res.status(400).json({ message: `Incorrect currency paid: ${payment.currency}` });
-    }
-
-    const orderAmount = parseFloat(order.totalPrice.toString());
-    const paidAmount = parseFloat(payment.value);
-
-    console.log(`Amount comparison: Order=${orderAmount}, Paid=${paidAmount}`);
-
-    if (Math.round(orderAmount * 100) !== Math.round(paidAmount * 100)) {
-      return res.status(400).json({
-        message: `Incorrect amount paid. Expected: $${orderAmount}, Received: $${paidAmount}`
-      });
-    }
-
-    // Update order with payment information
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: payment.id,
-      status: req.body.status || 'COMPLETED',
-      update_time: req.body.update_time || new Date().toISOString(),
-      email_address: req.body.payer?.email_address || 'N/A',
-    };
-
-    const updatedOrder = await order.save();
-    console.log('Order payment updated successfully:', updatedOrder._id);
-
-    res.json(updatedOrder);
+    res.status(402).json({ message: 'The payment could not be completed. Please try again.' });
   } catch (error) {
-    // Unique index on paymentResult.id: another request used this transaction first
+    if (error.issue === 'INSTRUMENT_DECLINED') {
+      return res.status(402).json({ message: 'Your payment method was declined. Please try another one.' });
+    }
+
+    // Unique index on paymentResult.id: this transaction already paid another order
     if (error.code === 11000) {
       return res.status(400).json({ message: 'Transaction has been used before' });
     }
 
-    console.error('Error processing payment:', error);
+    console.error('Error capturing PayPal payment:', error);
     res.status(500).json({
-      message: error.message || 'Error processing payment',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: 'We could not confirm your payment. Please refresh the page and check this order before paying again.',
     });
   }
 });
@@ -267,7 +318,8 @@ const getAllOrders=asyncHandler(async(req,res)=>{
 
 export {
   getAllOrders,
-  updateOrderToPaid,
+  createPayPalPayment,
+  capturePayPalPayment,
   updateOrderToDeliver,
   getOrderById,
   getMyOrders,

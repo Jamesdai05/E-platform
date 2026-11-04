@@ -1,6 +1,7 @@
 import {
   getAllOrders,
-  updateOrderToPaid,
+  createPayPalPayment,
+  capturePayPalPayment,
   updateOrderToDeliver,
   getOrderById,
   getMyOrders,
@@ -24,7 +25,8 @@ router.route("/mine").get(protectRoute,getMyOrders);
 //single order route
 router.route("/:id").get(protectRoute,getOrderById)
 // router.route("/:id").get(getOrderById)
-router.route("/:id/pay").put(protectRoute,updateOrderToPaid)
+router.route("/:id/paypal").post(protectRoute,createPayPalPayment)
+router.route("/:id/paypal/capture").post(protectRoute,capturePayPalPayment)
 
 //Admin to update the deliver status
 

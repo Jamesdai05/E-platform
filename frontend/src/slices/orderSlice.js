@@ -19,12 +19,20 @@ export const ordersApiSlice=apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor:5,
     }),
-    payOrder:builder.mutation({
-      query:({orderId,details})=>({
-        url:`${ORDERS_URL}/${orderId}/pay`,
-        method:"PUT",
-        body:{...details}
-      })
+    // the backend creates the PayPal order from the saved total
+    createPayPalPayment:builder.mutation({
+      query:(orderId)=>({
+        url:`${ORDERS_URL}/${orderId}/paypal`,
+        method:"POST",
+      }),
+    }),
+    // the backend captures the money once the customer has approved
+    capturePayPalPayment:builder.mutation({
+      query:(orderId)=>({
+        url:`${ORDERS_URL}/${orderId}/paypal/capture`,
+        method:"POST",
+      }),
+      invalidatesTags:["Orders"],
     }),
     getPayPalClientId:builder.query({
       query:()=>({
@@ -63,7 +71,8 @@ export const {
   useCreateOrderMutation,
   useGetmyordersQuery,
   useGetOrderDetailsQuery,
-  usePayOrderMutation,
+  useCreatePayPalPaymentMutation,
+  useCapturePayPalPaymentMutation,
   useGetPayPalClientIdQuery,
   useGetallordersQuery,
   useDeliveredorderMutation,

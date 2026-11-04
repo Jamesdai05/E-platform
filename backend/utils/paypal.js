@@ -1,18 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
-const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL, PAYPAL_MERCHANT_ID } = process.env;
-
-/**
- * Checks that a client-supplied value has the shape of a PayPal order ID.
- * Without this, values like "ABC123#1" reach the same PayPal order while looking
- * like a new ID to the replay check.
- *
- * @param {*} id - The value sent by the client.
- * @returns {boolean} True if the value is a well-formed PayPal order ID.
- */
-export function isValidPayPalOrderId(id) {
-  return typeof id === 'string' && /^[A-Z0-9]{1,36}$/.test(id);
-}
+const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET, PAYPAL_API_URL } = process.env;
 
 /**
  * Validates that all required PayPal environment variables are present
@@ -24,7 +12,6 @@ function validatePayPalEnvironmentVariables() {
   if (!PAYPAL_CLIENT_ID) missingVars.push('PAYPAL_CLIENT_ID');
   if (!PAYPAL_APP_SECRET) missingVars.push('PAYPAL_APP_SECRET');
   if (!PAYPAL_API_URL) missingVars.push('PAYPAL_API_URL');
-  if (!PAYPAL_MERCHANT_ID) missingVars.push('PAYPAL_MERCHANT_ID');
 
   if (missingVars.length > 0) {
     const errorMessage = `
@@ -92,82 +79,126 @@ async function getPayPalAccessToken() {
 }
 
 /**
- * Checks if a PayPal transaction is new by comparing the transaction ID with existing orders in the database.
+ * Sends an authenticated request to the PayPal Orders API.
  *
- * @param {Mongoose.Model} orderModel - The Mongoose model for the orders in the database.
- * @param {string} paypalTransactionId - The PayPal transaction ID to be checked.
- * @returns {Promise<boolean>} Returns true if it is a new transaction (i.e., the transaction ID does not exist in the database), false otherwise.
- * @throws {Error} If there's an error in querying the database.
- *
+ * @param {string} path - The API path, starting with a slash.
+ * @param {Object} [options] - Extra fetch options. Headers are merged with the defaults.
+ * @returns {Promise<Response>} The raw response.
  */
-export async function checkIfNewTransaction(orderModel, paypalTransactionId) {
-  try {
-    // Find all documents where Order.paymentResult.id is the same as the id passed paypalTransactionId
-    const orders = await orderModel.find({
-      'paymentResult.id': paypalTransactionId,
-    });
+async function paypalRequest(path, { headers, ...options } = {}) {
+  const accessToken = await getPayPalAccessToken();
 
-    // If there are no such orders, then it's a new transaction.
-    return orders.length === 0;
-  } catch (err) {
-    console.error(err);
-  }
+  return fetch(`${PAYPAL_API_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+      ...headers,
+    },
+  });
 }
 
 /**
- * Verifies a PayPal payment by making a request to the PayPal API.
+ * Builds an Error from a failed PayPal response. PayPal's reason stays in the
+ * server log and in error.issue, so it is not sent to customers by accident.
+ *
+ * @param {string} action - What was being attempted, for the log.
+ * @param {Response} response - The failed response.
+ * @param {Object} body - The parsed response body.
+ * @returns {Error} An error with an 'issue' property holding PayPal's issue code.
+ */
+function paypalError(action, response, body) {
+  console.error(`PayPal ${action} error:`, response.status, JSON.stringify(body));
+
+  const error = new Error(`PayPal ${action} failed with status ${response.status}`);
+  error.issue = body.details?.[0]?.issue;
+  return error;
+}
+
+/**
+ * Creates a PayPal order for the saved total of a shop order.
+ * @see {@link https://developer.paypal.com/docs/api/orders/v2/#orders_create}
+ *
+ * @param {Object} order - The shop order.
+ * @returns {Promise<string>} The PayPal order ID.
+ * @throws {Error} If the request is not successful.
+ */
+export async function createPayPalOrder(order) {
+  const response = await paypalRequest('/v2/checkout/orders', {
+    method: 'POST',
+    body: JSON.stringify({
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          custom_id: order._id.toString(),
+          description: `Order ${order._id}`,
+          amount: {
+            currency_code: 'USD',
+            value: order.totalPrice.toFixed(2),
+          },
+        },
+      ],
+    }),
+  });
+
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw paypalError('create order', response, body);
+  }
+
+  return body.id;
+}
+
+/**
+ * Fetches a PayPal order.
  * @see {@link https://developer.paypal.com/docs/api/orders/v2/#orders_get}
  *
- * @param {string} paypalTransactionId - The PayPal transaction ID to be verified.
- * @returns {Promise<Object>} An object with 'verified' (payment is completed), 'id' (PayPal's own order ID), 'value' and 'currency' (payment amount), 'customId' (the shop order this payment was created for) and 'payeeVerified' (the money went to this merchant).
+ * @param {string} paypalOrderId - The PayPal order ID.
+ * @returns {Promise<Object|null>} The PayPal order, or null if it no longer exists.
  * @throws {Error} If the request is not successful.
- *
  */
-export async function verifyPayPalPayment(paypalTransactionId) {
-  try {
-    /* console.log('Verifying PayPal payment for transaction ID:', paypalTransactionId); */
+export async function getPayPalOrder(paypalOrderId) {
+  const response = await paypalRequest(`/v2/checkout/orders/${paypalOrderId}`);
 
-    const accessToken = await getPayPalAccessToken();
-    const url = `${PAYPAL_API_URL}/v2/checkout/orders/${encodeURIComponent(paypalTransactionId)}`;
-
-    console.log('Making PayPal verification request to:', url);
-
-    const paypalResponse = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!paypalResponse.ok) {
-      const errorText = await paypalResponse.text();
-      console.error('PayPal verification error:', paypalResponse.status, errorText);
-      throw new Error(`Failed to verify payment: ${paypalResponse.status} ${errorText}`);
-    }
-
-    const paypalData = await paypalResponse.json();
-    console.log('PayPal verification response:', JSON.stringify(paypalData, null, 2));
-
-    const isCompleted = paypalData.status === 'COMPLETED';
-    const purchaseUnit = paypalData.purchase_units?.[0];
-    const paymentValue = purchaseUnit?.amount?.value;
-
-    if (!paymentValue) {
-      throw new Error('Payment amount not found in PayPal response');
-    }
-
-    console.log(`Payment verification result: verified=${isCompleted}, value=${paymentValue}`);
-
-    return {
-      verified: isCompleted,
-      id: paypalData.id,
-      value: paymentValue,
-      currency: purchaseUnit.amount.currency_code,
-      customId: purchaseUnit.custom_id,
-      payeeVerified: purchaseUnit.payee?.merchant_id === PAYPAL_MERCHANT_ID,
-    };
-  } catch (error) {
-    console.error('Error verifying PayPal payment:', error);
-    throw error;
+  if (response.status === 404) {
+    return null;
   }
+
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw paypalError('get order', response, body);
+  }
+
+  return body;
+}
+
+/**
+ * Captures the money for an approved PayPal order. Safe to repeat: the request ID
+ * makes PayPal treat retries as the same capture, and an order that was already
+ * captured is returned as it stands.
+ * @see {@link https://developer.paypal.com/docs/api/orders/v2/#orders_capture}
+ *
+ * @param {string} paypalOrderId - The PayPal order ID.
+ * @returns {Promise<Object>} The full PayPal order, including its captures.
+ * @throws {Error} If the capture fails. error.issue holds PayPal's issue code.
+ */
+export async function capturePayPalOrder(paypalOrderId) {
+  const response = await paypalRequest(`/v2/checkout/orders/${paypalOrderId}/capture`, {
+    method: 'POST',
+    headers: {
+      Prefer: 'return=representation',
+      'PayPal-Request-Id': `capture-${paypalOrderId}`,
+    },
+  });
+
+  const body = await response.json().catch(() => ({}));
+  if (response.ok) {
+    return body;
+  }
+
+  if (body.details?.[0]?.issue === 'ORDER_ALREADY_CAPTURED') {
+    return getPayPalOrder(paypalOrderId);
+  }
+
+  throw paypalError('capture', response, body);
 }

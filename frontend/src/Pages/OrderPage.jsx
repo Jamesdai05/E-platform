@@ -6,12 +6,16 @@ import { useSelector } from "react-redux";
 import {
     useGetOrderDetailsQuery,
     useGetPayPalClientIdQuery,
-    usePayOrderMutation,
+    useCreatePayPalPaymentMutation,
+    useCapturePayPalPaymentMutation,
     useDeliveredorderMutation,
 } from "../slices/orderSlice.js";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+
+// Shared so a failed payment shows one toast, not one each from us and from PayPal
+const PAYPAL_ERROR_TOAST = "paypal-error";
 
 const OrderPage = () => {
     const { id: orderId } = useParams();
@@ -23,7 +27,10 @@ const OrderPage = () => {
         error,
     } = useGetOrderDetailsQuery(orderId);
 
-    const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+    const [createPayPalPayment] = useCreatePayPalPaymentMutation();
+
+    const [capturePayPalPayment, { isLoading: loadingPay }] =
+        useCapturePayPalPaymentMutation();
 
     const [deliverOrder, { isLoading: loadingDeliver }] =
         useDeliveredorderMutation();
@@ -73,17 +80,18 @@ const OrderPage = () => {
         }
     }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
-    const onApprove = async function (data, actions) {
-        // console.log("PayPal onApprove called with data:", data);
+    const onApprove = async function () {
         try {
-            const details = await actions.order.capture();
-            console.log("PayPal capture successful:", details);
-
-            await payOrder({ orderId, details }).unwrap();
+            const result = await capturePayPalPayment(orderId).unwrap();
             refetch();
-            toast.success("Payment successful!");
+            if (result.isPaid) {
+                toast.success("Payment successful!");
+            } else {
+                toast.info(result.message);
+            }
         } catch (error) {
             console.error("Payment processing error:", error);
+            refetch();
             toast.error(
                 error?.data?.message ||
                     error?.message ||
@@ -94,47 +102,27 @@ const OrderPage = () => {
 
     function onError(err) {
         console.error("PayPal error:", err);
-        toast.error(`PayPal error: ${err.message || "Unknown error occurred"}`);
+        toast.error(
+            `PayPal error: ${err.message || "Unknown error occurred"}`,
+            { toastId: PAYPAL_ERROR_TOAST }
+        );
     }
 
-    function createOrder(data, actions) {
-        console.log("Creating PayPal order with amount:", order.totalPrice);
-        return actions.order
-            .create({
-                purchase_units: [
-                    {
-                        amount: {
-                            value: order.totalPrice.toString(),
-                            currency_code: "USD",
-                        },
-                        description: `Order ${order._id}`,
-                        // The backend checks this to tie the payment to this order
-                        custom_id: order._id,
-                    },
-                ],
-                intent: "CAPTURE",
-            })
-            .then((orderId) => {
-                console.log("PayPal order created with ID:", orderId);
-                return orderId;
-            })
-            .catch((error) => {
-                console.error("Error creating PayPal order:", error);
-                throw error;
-            });
-    }
-
-    // Test function for development
-    async function onApproveTest() {
+    async function createOrder() {
         try {
-            await payOrder({ orderId, details: { payer: {} } }).unwrap();
-            refetch();
-            toast.success("Test payment successful!");
+            const { id } = await createPayPalPayment(orderId).unwrap();
+            return id;
         } catch (error) {
-            console.error("Test payment error:", error);
-            toast.error(error?.data?.message || error?.message);
+            console.error("Error creating PayPal order:", error);
+            const message =
+                error?.data?.message || "Could not start the PayPal payment.";
+            toast.error(message, { toastId: PAYPAL_ERROR_TOAST });
+            // The backend may have just found an earlier payment for this order
+            refetch();
+            throw new Error(message);
         }
     }
+
     const handleDeliver = async () => {
         try {
             await deliverOrder(orderId);
@@ -270,57 +258,34 @@ const OrderPage = () => {
                                             {isPending ? (
                                                 <Loader />
                                             ) : (
-                                                <>
-                                                    <div>
-                                                        {/* Development test button */}
-                                                        {process.env
-                                                            .NODE_ENV ===
-                                                            "development" && (
-                                                            <Button
-                                                                onClick={
-                                                                    onApproveTest
-                                                                }
-                                                                style={{
-                                                                    marginBottom:
-                                                                        "10px",
-                                                                }}
-                                                                variant="outline-secondary"
-                                                                size="sm"
-                                                            >
-                                                                Test Pay Order
-                                                                (Dev Only)
-                                                            </Button>
-                                                        )}
-                                                        <div>
-                                                            <PayPalButtons
-                                                                key={`paypal-${order._id}`}
-                                                                createOrder={
-                                                                    createOrder
-                                                                }
-                                                                onApprove={
-                                                                    onApprove
-                                                                }
-                                                                onError={
-                                                                    onError
-                                                                }
-                                                                onCancel={() => {
-                                                                    console.log(
-                                                                        "PayPal payment cancelled"
-                                                                    );
-                                                                    toast.info(
-                                                                        "Payment cancelled"
-                                                                    );
-                                                                }}
-                                                                style={{
-                                                                    layout: "vertical",
-                                                                    color: "gold",
-                                                                    shape: "rect",
-                                                                    label: "paypal",
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </>
+                                                <div>
+                                                    <PayPalButtons
+                                                        key={`paypal-${order._id}`}
+                                                        createOrder={
+                                                            createOrder
+                                                        }
+                                                        onApprove={
+                                                            onApprove
+                                                        }
+                                                        onError={
+                                                            onError
+                                                        }
+                                                        onCancel={() => {
+                                                            console.log(
+                                                                "PayPal payment cancelled"
+                                                            );
+                                                            toast.info(
+                                                                "Payment cancelled"
+                                                            );
+                                                        }}
+                                                        style={{
+                                                            layout: "vertical",
+                                                            color: "gold",
+                                                            shape: "rect",
+                                                            label: "paypal",
+                                                        }}
+                                                    />
+                                                </div>
                                             )}
                                         </ListGroup.Item>
                                     )}

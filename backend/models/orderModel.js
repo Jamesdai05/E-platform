@@ -43,6 +43,10 @@ const orderSchema=mongoose.Schema({
     type:String,
     required:true,
   },
+  // The PayPal order this server created. It is the only one that can pay this order.
+  paypalOrderId:{
+    type:String,
+  },
   paymentResult:{
     id:{type:String},
     status:{type:String},
