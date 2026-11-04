@@ -8,6 +8,7 @@ import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
+import { startOrderExpiryJob } from "./utils/orderExpiry.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -132,4 +133,5 @@ app.use(errorHandler);
 
 app.listen(port,()=>{
   console.log(`Server is listening on port ${port}.`);
+  startOrderExpiryJob();
 })

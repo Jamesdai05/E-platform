@@ -35,7 +35,8 @@ const OrderPage = () => {
     const [deliverOrder, { isLoading: loadingDeliver }] =
         useDeliveredorderMutation();
 
-    const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+    const [{ isInitial, isResolved, isRejected }, paypalDispatch] =
+        usePayPalScriptReducer();
 
     const {
         data: paypal,
@@ -44,6 +45,9 @@ const OrderPage = () => {
     } = useGetPayPalClientIdQuery();
 
     const { userInfo } = useSelector((state) => state.auth);
+
+    const paypalUnavailable =
+        errorPayPal || isRejected || (paypal && !paypal.clientId);
 
     useEffect(() => {
         if (!errorPayPal && !loadingPayPal && paypal?.clientId) {
@@ -74,11 +78,12 @@ const OrderPage = () => {
                 }
             };
 
-            if (order && !order.isPaid) {
+            // Load once: reloading would rebuild the buttons mid-payment
+            if (order && !order.isPaid && !order.stockReleased && isInitial) {
                 loadPaypalScript();
             }
         }
-    }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
+    }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch, isInitial]);
 
     const onApprove = async function () {
         try {
@@ -125,7 +130,7 @@ const OrderPage = () => {
 
     const handleDeliver = async () => {
         try {
-            await deliverOrder(orderId);
+            await deliverOrder(orderId).unwrap();
             refetch();
             toast.success("Order is delivered!", { position: "top-center" });
         } catch (error) {
@@ -155,11 +160,11 @@ const OrderPage = () => {
                                     <h2>Shipping</h2>
                                     <p>
                                         <b>Name: </b>
-                                        {order.user.name}
+                                        {order.user?.name ?? "Deleted user"}
                                     </p>
                                     <p>
                                         <b>Email: </b>
-                                        {order.user.email}
+                                        {order.user?.email ?? "N/A"}
                                     </p>
                                     <p>
                                         <b>Address: </b>
@@ -255,7 +260,20 @@ const OrderPage = () => {
                                     {!order.isPaid && (
                                         <ListGroup.Item>
                                             {loadingPay && <Loader />}
-                                            {isPending ? (
+                                            {order.stockReleased ? (
+                                                <Message variant="danger">
+                                                    This order has expired
+                                                    because it was not paid in
+                                                    time. Please place a new
+                                                    order.
+                                                </Message>
+                                            ) : paypalUnavailable ? (
+                                                <Message variant="danger">
+                                                    PayPal is unavailable right
+                                                    now. Please refresh the page
+                                                    or try again later.
+                                                </Message>
+                                            ) : !isResolved ? (
                                                 <Loader />
                                             ) : (
                                                 <div>

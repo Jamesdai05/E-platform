@@ -90,6 +90,12 @@ const orderSchema=mongoose.Schema({
 
   deliveredAt:{
     type:Date,
+  },
+
+  // True once an unpaid order has expired and its stock has gone back on sale
+  stockReleased:{
+    type:Boolean,
+    default:false,
   }
 
 },{timestamps:true})

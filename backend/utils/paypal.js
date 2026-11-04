@@ -202,3 +202,51 @@ export async function capturePayPalOrder(paypalOrderId) {
 
   throw paypalError('capture', response, body);
 }
+
+// Applies a PayPal order's capture to a shop order, marking it paid once the money
+// has really arrived. Returns "paid", "pending" (PayPal is still processing it) or
+// "failed" (no money was taken, so the customer can try again).
+export async function settlePayment(order, paypalOrder) {
+  const capture = paypalOrder.purchase_units?.[0]?.payments?.captures?.[0];
+
+  if (capture?.status === 'PENDING') {
+    return 'pending';
+  }
+  if (capture?.status !== 'COMPLETED') {
+    return 'failed';
+  }
+
+  // Compare in whole cents to avoid floating point errors
+  const paidInFull =
+    capture.amount?.currency_code === 'USD' &&
+    Math.round(parseFloat(capture.amount.value) * 100) === Math.round(order.totalPrice * 100);
+
+  if (!paidInFull) {
+    console.error(`Captured amount does not match order ${order._id}:`, capture.amount);
+    return 'failed';
+  }
+
+  order.isPaid = true;
+  // A paid order keeps its stock, even if the expiry job had claimed it
+  order.stockReleased = false;
+  order.paidAt = Date.now();
+  order.paymentResult = {
+    id: paypalOrder.id,
+    status: capture.status,
+    update_time: capture.update_time,
+    email_address:
+      paypalOrder.payment_source?.paypal?.email_address ||
+      paypalOrder.payer?.email_address ||
+      'N/A',
+  };
+  await order.save();
+
+  return 'paid';
+}
+
+// Checks the PayPal order stored on a shop order and applies any capture it has.
+// Returns the same values as settlePayment.
+export async function settleStoredPayment(order) {
+  const paypalOrder = await getPayPalOrder(order.paypalOrderId);
+  return paypalOrder ? settlePayment(order, paypalOrder) : 'failed';
+}

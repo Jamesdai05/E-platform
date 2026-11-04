@@ -45,7 +45,7 @@ const Placeorder = () => {
       dispatch(clearCartItems());
       navigate(`/order/${res._id}`);
     } catch (error) {
-      toast.error(error,{position:"top-center"});
+      toast.error(error?.data?.message || error?.error || "Could not place the order.",{position:"top-center"});
     }
   };
 

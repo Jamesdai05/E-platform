@@ -19,7 +19,7 @@ const Payment = () => {
 
   // check the address exists or not
   useEffect(() => {
-    if (!shippingAddress) {
+    if (!shippingAddress?.address) {
       navigate("/shipping");
     }
   }, [shippingAddress, navigate]);
@@ -44,7 +44,7 @@ const Payment = () => {
                 className="my-2"
                 label="Credit Card or PayPal"
                 name="paymentMethod"
-                value="PayPal"
+                value="Paypal"
                 checked
                 onChange={(e) => setPaymentMethod(e.target.value)}
               ></Form.Check>

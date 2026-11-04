@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 import Order from "../models/orderModel.js";
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
-import { createPayPalOrder, getPayPalOrder, capturePayPalOrder } from '../utils/paypal.js';
+import { createPayPalOrder, capturePayPalOrder, settlePayment, settleStoredPayment } from '../utils/paypal.js';
+import { restoreStock } from '../utils/orderExpiry.js';
 
 // Only the customer who placed an order, or an admin, may read or pay it.
 // order.user may be an id or a populated user, and is null if the user was deleted.
@@ -26,6 +27,11 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     if (!shippingAddress || !paymentMethod) {
       return res.status(400).json({ message: "Shipping address and payment method are required" });
+    }
+
+    // PayPal is the only payment method. The frontend may send either spelling.
+    if (typeof paymentMethod !== "string" || paymentMethod.trim().toLowerCase() !== "paypal") {
+      return res.status(400).json({ message: "Unsupported payment method" });
     }
 
     // Validate order items structure
@@ -93,21 +99,33 @@ const addOrderItems = asyncHandler(async (req, res) => {
         postalCode: shippingAddress.postalCode?.trim(),
         country: shippingAddress.country?.trim(),
       },
-      paymentMethod: paymentMethod.trim(),
+      paymentMethod: "PayPal",
       itemsPrice: Number(itemsPrice),
       taxPrice: Number(taxPrice),
       shippingPrice: Number(shippingPrice),
       totalPrice: Number(totalPrice),
     });
 
-    const createdOrder = await order.save();
+    // Reserve the stock. The check and the update are one atomic step, so two
+    // customers cannot both buy the last item.
+    const reservedItems = [];
+    let createdOrder;
+    try {
+      for (const item of dbOrderItems) {
+        const reserved = await Product.findOneAndUpdate(
+          { _id: item.product, countInStock: { $gte: item.qty } },
+          { $inc: { countInStock: -item.qty } }
+        );
+        if (!reserved) {
+          throw new Error(`Insufficient stock for ${item.name}`);
+        }
+        reservedItems.push(item);
+      }
 
-    // Update product stock
-    for (const item of dbOrderItems) {
-      await Product.findByIdAndUpdate(
-        item.product,
-        { $inc: { countInStock: -item.qty } }
-      );
+      createdOrder = await order.save();
+    } catch (error) {
+      await restoreStock(reservedItems);
+      throw error;
     }
 
     res.status(201).json(createdOrder);
@@ -173,47 +191,11 @@ const updateOrderToDeliver=asyncHandler(async(req,res)=>{
 })
 
 
-// Applies a PayPal order's capture to a shop order, marking it paid once the money
-// has really arrived. Returns "paid", "pending" (PayPal is still processing it) or
-// "failed" (no money was taken, so the customer can try again).
-const settlePayment = async (order, paypalOrder) => {
-  const capture = paypalOrder.purchase_units?.[0]?.payments?.captures?.[0];
-
-  if (capture?.status === 'PENDING') {
-    return 'pending';
-  }
-  if (capture?.status !== 'COMPLETED') {
-    return 'failed';
-  }
-
-  // Compare in whole cents to avoid floating point errors
-  const paidInFull =
-    capture.amount?.currency_code === 'USD' &&
-    Math.round(parseFloat(capture.amount.value) * 100) === Math.round(order.totalPrice * 100);
-
-  if (!paidInFull) {
-    console.error(`Captured amount does not match order ${order._id}:`, capture.amount);
-    return 'failed';
-  }
-
-  order.isPaid = true;
-  order.paidAt = Date.now();
-  order.paymentResult = {
-    id: paypalOrder.id,
-    status: capture.status,
-    update_time: capture.update_time,
-    email_address:
-      paypalOrder.payment_source?.paypal?.email_address ||
-      paypalOrder.payer?.email_address ||
-      'N/A',
-  };
-  await order.save();
-
-  return 'paid';
-};
-
 const PAYMENT_PENDING_MESSAGE =
   'Your payment is being processed by PayPal. Please do not pay again.';
+
+const ORDER_EXPIRED_MESSAGE =
+  'This order has expired because it was not paid in time. Please place a new order.';
 
 // @desc   Start a PayPal payment for the saved order total
 // @route  POST api/orders/:id/paypal
@@ -233,11 +215,14 @@ const createPayPalPayment = asyncHandler(async (req, res) => {
       return res.status(409).json({ message: 'Order is already paid' });
     }
 
+    if (order.stockReleased) {
+      return res.status(409).json({ message: ORDER_EXPIRED_MESSAGE });
+    }
+
     // An earlier attempt may have taken the money without the order being updated,
     // so check it before letting the customer pay a second time.
     if (order.paypalOrderId) {
-      const earlierAttempt = await getPayPalOrder(order.paypalOrderId);
-      const result = earlierAttempt ? await settlePayment(order, earlierAttempt) : 'failed';
+      const result = await settleStoredPayment(order);
 
       if (result === 'paid') {
         return res.status(409).json({ message: 'Order is already paid' });
@@ -273,6 +258,11 @@ const capturePayPalPayment = asyncHandler(async (req, res) => {
 
     if (order.isPaid) {
       return res.status(400).json({ message: 'Order is already paid' });
+    }
+
+    // Its stock has gone back on sale, so no money may be taken for it
+    if (order.stockReleased) {
+      return res.status(409).json({ message: ORDER_EXPIRED_MESSAGE });
     }
 
     // Only the payment this server created for this order can ever be captured
