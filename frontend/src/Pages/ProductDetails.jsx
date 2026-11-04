@@ -8,6 +8,7 @@ import LazyImage from '../components/LazyImage.jsx';
 import { useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from '../slices/cartSlice.js';
+import { useGetmyordersQuery } from '../slices/orderSlice.js';
 import { toast } from 'react-toastify';
 
 
@@ -36,7 +37,19 @@ const ProductDetails = () => {
 
   const [createReview, {isLoading:loadingReview}] =useCreateReviewMutation();
 
-  const userInfo=useSelector(state=>state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Only customers with a paid order for this product can write a review.
+  // This just chooses what to show: the backend makes the real check.
+  const { data: myOrders, isLoading: loadingOrders } = useGetmyordersQuery(undefined, {
+    skip: !userInfo,
+  });
+
+  const hasBought = myOrders?.some(
+    (order) => order.isPaid && order.orderItems.some((item) => item.product === productId)
+  );
+
+  const hasReviewed = product?.reviews?.some((review) => review.user === userInfo?._id);
 
   const handleAddToCart = () => {
     dispatch(addToCart({ ...product, qty }));
@@ -189,6 +202,14 @@ const ProductDetails = () => {
                     <Message>
                       Please <Link to="/login">log in</Link> to write a review.
                     </Message>
+                  ) : loadingOrders ? (
+                    <Loader />
+                  ) : !hasBought ? (
+                    <Message>
+                      Only customers who bought this product can write a review.
+                    </Message>
+                  ) : hasReviewed ? (
+                    <Message>You have already reviewed this product.</Message>
                   ) : (
                     <Form>
                       <Form.Group controlId="rating" className="my-2">

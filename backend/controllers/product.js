@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Product from "../models/productModel.js";
+import Order from "../models/orderModel.js";
 
 
 // @desc   fetch all products
@@ -121,14 +122,38 @@ const deleteProductsById = asyncHandler(async (req, res) => {
 
 // @desc   Create a product review
 // @route  POST /api/products/:id/reviews
-// @access Private
+// @access Private (customers with a paid order for this product)
 
 const createProductReview = asyncHandler(async (req, res) => {
     // res.send("review")
     const { rating, comment } = req.body;
+
+    const ratingValue = Number(rating);
+    const isValidRating =
+        ["string", "number"].includes(typeof rating) &&
+        Number.isInteger(ratingValue) && ratingValue >= 1 && ratingValue <= 5;
+
+    if (!isValidRating) {
+        return res.status(400).json({ message: "Rating must be a whole number from 1 to 5." });
+    }
+
+    if (typeof comment !== "string" || !comment.trim()) {
+        return res.status(400).json({ message: "Please write a comment." });
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (product) {
+
+        const hasBought = await Order.exists({
+            user: req.user._id,
+            isPaid: true,
+            "orderItems.product": product._id,
+        });
+
+        if (!hasBought) {
+            return res.status(403).json({ message: "Only customers who bought this product can review it." });
+        }
 
         const alreadyReview = product.reviews.find(
             // the review user and the user in the req to be the same or not
@@ -140,8 +165,8 @@ const createProductReview = asyncHandler(async (req, res) => {
         }
         const review = {
             name: req.user.name,
-            rating: Number(rating),
-            comment,
+            rating: ratingValue,
+            comment: comment.trim(),
             user: req.user._id,
         };
 
@@ -153,7 +178,7 @@ const createProductReview = asyncHandler(async (req, res) => {
         await product.save();
         res.status(201).json({ message: "Review submitted!" });
     } else {
-        res.status(404).json("Product not found.");
+        res.status(404).json({ message: "Product not found." });
     }
 });
 
