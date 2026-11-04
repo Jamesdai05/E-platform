@@ -3,6 +3,19 @@ import User from '../models/userModel.js';
 import jwt from "jsonwebtoken";
 import generateToken from "../utils/tokengeneration.js";
 
+// Rules for a new password, returning the problem or null. Login does not use this,
+// so accounts with an older, shorter password can still sign in.
+const getPasswordError = (password) => {
+  if (typeof password !== "string" || password.length < 8) {
+    return "Password must be at least 8 characters";
+  }
+  // bcrypt ignores everything after 72 bytes
+  if (Buffer.byteLength(password) > 72) {
+    return "Password must be at most 72 characters";
+  }
+  return null;
+};
+
 
 
 // @desc Auth user && get token
@@ -58,6 +71,12 @@ const registrationOfUser=asyncHandler(async(req,res)=>{
   if(typeof email !== "string" || typeof name !== "string" || typeof password !== "string"){
     res.status(400);
     throw new Error("Invalid user data!")
+  }
+
+  const passwordError=getPasswordError(password);
+  if(passwordError){
+    res.status(400);
+    throw new Error(passwordError)
   }
 
   const isUserExists=await User.findOne({email});
@@ -139,6 +158,11 @@ const updateUserProfile=asyncHandler(async(req,res)=>{
 
     // if there is password in the req body
     if(req.body.password){
+      const passwordError=getPasswordError(req.body.password);
+      if(passwordError){
+        res.status(400);
+        throw new Error(passwordError)
+      }
       user.password=req.body.password;
     }
 

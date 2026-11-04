@@ -35,6 +35,8 @@ const ProfilePage = () => {
     e.preventDefault()
     if(password!==confirmPassword){
       toast.error("Passwords do not match!")
+    }else if(password && password.length<8){
+      toast.error("Password must be at least 8 characters")
     }else{
       try {
         const res=await updateProfile({
@@ -49,7 +51,7 @@ const ProfilePage = () => {
           position: "top-center",
         });
       } catch (error) {
-        toast.error(error?.data?.Message || error?.error, {
+        toast.error(error?.data?.message || error?.error, {
           position: "top-center",
         });
       }

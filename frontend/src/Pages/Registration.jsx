@@ -8,7 +8,6 @@ import { setCredentials } from "../slices/authSlice.js";
 import { toast } from "react-toastify";
 import { useRegistrationMutation } from "../slices/usersApiSlice.js";
 
-
 const Registration = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,22 +41,26 @@ const Registration = () => {
     e.preventDefault();
 
     // validate the form
-    if (!email || !password || !confirmPassword ||!name) {
+    if (!email || !password || !confirmPassword || !name) {
       toast.error("Please fill in all fields!");
       return;
-    }else{
+    } else if (confirmPassword !== password) {
+      toast.error("Passwords do not match");
+      return;
+    } else if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    } else {
       try {
-        const res = await registration({ email, password,name }).unwrap();
+        const res = await registration({ email, password, name }).unwrap();
         dispatch(setCredentials({ ...res }));
         navigate(redirect);
       } catch (err) {
         console.log(err);
-        toast.error(err?.data?.message || err?.error,{position:"top-center"});
+        toast.error(err?.data?.message || err?.error, { position: "top-center" });
       }
     }
   };
-
-
 
   return (
     <FormContainer>
@@ -100,12 +103,7 @@ const Registration = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        <Button
-          type="submit"
-          variant="primary"
-          className="btn btn-lg my-4"
-          disabled={isLoading}
-        >
+        <Button type="submit" variant="primary" className="btn btn-lg my-4" disabled={isLoading}>
           Sign Up
         </Button>
         {isLoading && <Loader />}
@@ -113,11 +111,8 @@ const Registration = () => {
 
       <Row className="py-3">
         <Col>
-          Already have an account? {" "}
-          <Link
-            className="fw-bold"
-            to={redirect ? `/login?redirect=${redirect}` : "/login"}
-          >
+          Already have an account?{" "}
+          <Link className="fw-bold" to={redirect ? `/login?redirect=${redirect}` : "/login"}>
             Log in
           </Link>
         </Col>
