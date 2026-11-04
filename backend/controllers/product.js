@@ -2,6 +2,13 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Product from "../models/productModel.js";
 import Order from "../models/orderModel.js";
 
+// Reads the page from the query string. Anything that is not a usable page number
+// falls back to page 1, because a negative or huge value makes the database query fail.
+const getPageNumber = (value) => {
+    const page = Number(value);
+    return Number.isSafeInteger(page) && page > 0 ? page : 1;
+};
+
 
 // @desc   fetch all products
 // @route  GET /api/products
@@ -15,7 +22,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const getProductsWithPagination = asyncHandler(async (req, res) => {
     const pageSize = 8;
-    const page = Number(req.query.pageNumber) || 1; //the page number will be query number or the default 1.
+    const page = getPageNumber(req.query.pageNumber); //the page number will be query number or the default 1.
 
     const escapeRegex = text => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -205,7 +212,7 @@ const getTopProducts = asyncHandler(async (req, res) => {
 const getProductsByPrices = asyncHandler(async (req, res) => {
     const { minPrice, maxPrice } = req.query;
     const pageSize = 8;
-    const page = Number(req.query.pageNumber) || 1;
+    const page = getPageNumber(req.query.pageNumber);
 
     const min = minPrice  ? Number(minPrice) : 0;
     const max = maxPrice  ? Number(maxPrice) : undefined;
@@ -225,11 +232,13 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
 
     const query = { price: { $gte: min } };  // to find the product that price is greater or equal to min
 
-    const count = await Product.countDocuments(query);
     if (max !== undefined) query.price.$lte = max;  //the max price will be less than the max and equal to max figure.
 
+    // count after the query is complete, so the page total matches the results
+    const count = await Product.countDocuments(query);
+
     const products = await Product.find(query)
-        .sort({ price: 1 })
+        .sort({ price: 1, _id: 1 }) // _id gives equal prices a fixed order across pages
         .limit(pageSize)
         .skip(pageSize * (page-1));
 

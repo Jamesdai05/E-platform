@@ -91,6 +91,7 @@ const Home = () => {
                                         pages={data.pages}
                                         page={data.page}
                                         keyword={keyword ? keyword : ""}
+                                        query={searchParams.toString()}
                                     />
                                 </>
                             )
