@@ -1,0 +1,31 @@
+services:
+  # mongo:
+  #   image: mongo:8
+  #   container_name: eshop-mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - mongodata:/data/db
+
+  app:
+    build: .
+    container_name: eshop-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      # MONGO_URI: mongodb://mongo:27017/eshop
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_APP_SECRET: ${PAYPAL_APP_SECRET}
+      PAYPAL_API_URL: ${PAYPAL_API_URL}
+    volumes:
+      - uploads:/app/uploads
+    # depends_on:
+    #   - mongo
+
+volumes:
+  # mongodata:
+  uploads:
