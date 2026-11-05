@@ -11,6 +11,7 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { startOrderExpiryJob } from "./utils/orderExpiry.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import helmet from "helmet";
 
 dotenv.config()
 
@@ -67,7 +68,7 @@ connectDB()
 
 const app=express()
 
-const port =process.env.PORT || 5002
+const port =process.env.PORT || 5000
 
 // Render's proxy sits in front of the app, and req.ip must come from its header
 app.set('trust proxy', 1);
@@ -77,6 +78,28 @@ app.use(cors({
   origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:3000",
   credentials: true, /* This allows cookies to be sent with cross-origin requests*/
   allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+
+app.use(helmet({
+  // PayPal checkout opens a popup, which the stricter default would break
+  crossOriginOpenerPolicy:{policy:"same-origin-allow-popups"},
+  // Report-only logs violations in the browser console without blocking anything.
+  // Remove reportOnly once a real PayPal payment shows no violations.
+  contentSecurityPolicy:{
+    useDefaults:false,
+    reportOnly:true,
+    directives:{
+      defaultSrc:["'self'"],
+      scriptSrc:["'self'","https://*.paypal.com","https://*.paypalobjects.com"],
+      styleSrc:["'self'","'unsafe-inline'"],
+      imgSrc:["'self'","data:","https:"],
+      fontSrc:["'self'","data:"],
+      connectSrc:["'self'","https://*.paypal.com"],
+      frameSrc:["https://*.paypal.com"],
+      objectSrc:["'none'"],
+      baseUri:["'self'"],
+    },
+  },
 }))
 
 // app.use(cors());

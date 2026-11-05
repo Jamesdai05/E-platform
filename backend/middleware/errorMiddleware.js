@@ -17,7 +17,8 @@ const errorHandler = (err, req, res, next) => {
         return next(err);
     }
 
-    let statusCode=res.statusCode === 200 ? 500 : res.statusCode;
+    // err.status covers errors raised before a route runs, like malformed JSON
+    let statusCode=res.statusCode === 200 ? (err.status || 500) : res.statusCode;
     let message = err.message || 'An unexpected error occurred';
 
 
@@ -27,6 +28,15 @@ const errorHandler = (err, req, res, next) => {
         statusCode=404;
     }
 
+
+    // Unexpected errors go to the log. Their text can reveal how the app works,
+    // so visitors only get a general message in production.
+    if(statusCode >= 500){
+        console.error(err);
+        if(process.env.NODE_ENV === "production"){
+            message="Something went wrong. Please try again.";
+        }
+    }
 
     res.status(statusCode).json({
         message,

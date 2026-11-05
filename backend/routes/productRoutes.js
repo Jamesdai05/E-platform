@@ -1,7 +1,6 @@
 import express from 'express';
 import {
   createProduct,
-  // getProducts,
   getProductsWithPagination,
   getProductsById,
   updateProductsById,
@@ -15,7 +14,6 @@ import { admin, protectRoute } from '../middleware/authMiddleware.js';
 
 
 const router=express.Router()
-// router.route("/").get(getProducts).post(protectRoute,admin,createProduct);
 router.route("/").get(getProductsWithPagination).post(protectRoute,admin,createProduct);
 router.get("/top", getTopProducts);
 router.get("/price", getProductsByPrices);

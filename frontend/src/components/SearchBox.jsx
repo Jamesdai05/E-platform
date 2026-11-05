@@ -14,7 +14,7 @@ const SearchBox = () => {
     const searchResult=search.trim();
     if(searchResult){
       // console.log(search)
-      navigate(`/search/${searchResult}`)
+      navigate(`/search/${encodeURIComponent(searchResult)}`)
     }else{
       navigate("/")
     }

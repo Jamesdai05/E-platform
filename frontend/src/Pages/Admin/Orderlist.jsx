@@ -19,7 +19,7 @@ const Orderlist = () => {
         <Loader />
       ) : error ? (
         <Message variant="danger">
-          {error?.data.message || error?.error}
+          {error?.data?.message || error?.error}
         </Message>
       ) : (
         <Table striped hover responsive className="table-sm">

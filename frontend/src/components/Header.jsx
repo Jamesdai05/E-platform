@@ -8,6 +8,7 @@ import { logout } from "../slices/authSlice.js";
 import SearchBox from "./SearchBox.jsx";
 import { resetCart } from "../slices/cartSlice.js";
 import { apiSlice } from "../slices/apiSlice.js";
+import { toast } from "react-toastify";
 
 const Header = () => {
 
@@ -33,6 +34,7 @@ const Header = () => {
       navigate("/login",{replace:true});
     }catch(err){
       console.log(err);
+      toast.error(err?.data?.message || "Could not log out. Please try again.");
     }
   }
 

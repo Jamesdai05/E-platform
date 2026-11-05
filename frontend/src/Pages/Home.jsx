@@ -22,13 +22,13 @@ const Home = () => {
     const minPrice = searchParams.get("minPrice") || undefined;
     const maxPrice = searchParams.get("maxPrice") || undefined;
 
-    const basePath = keyword ? `/search/${keyword}` : "/";
+    const basePath = keyword ? `/search/${encodeURIComponent(keyword)}` : "/";
 
     // go back to page 1 wheneven the filter is changed
     const applyFilter = ({ minPrice, maxPrice }) => {
         const next = new URLSearchParams();
-        if (minPrice) next.set("minPrice", minPrice);
-        if (maxPrice) next.set("maxPrice", maxPrice);
+        if (minPrice !== undefined) next.set("minPrice", minPrice);
+        if (maxPrice !== undefined) next.set("maxPrice", maxPrice);
 
         navigate({ pathname: basePath, search: next.toString() });  // to set the search to from number to string
     };
@@ -86,6 +86,9 @@ const Home = () => {
                                 <Message>{productError?.data?.message || productError?.error}</Message>
                             ) : (
                                 <>
+                                    {data.products.length === 0 && (
+                                        <Message>No products found.</Message>
+                                    )}
                                     <Productlist products={data.products} />
                                     <Paginate
                                         pages={data.pages}

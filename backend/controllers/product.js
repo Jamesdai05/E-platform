@@ -19,16 +19,6 @@ const getKeywordFilter = (keyword) => {
     return { name: { $regex: escaped, $options: "i" } }; // not case sensitive
 };
 
-// @desc   fetch all products
-// @route  GET /api/products
-// @access public
-
-const getProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({});
-    res.json(products);
-});
-
-
 const getProductsWithPagination = asyncHandler(async (req, res) => {
     const pageSize = 8;
     const page = getPageNumber(req.query.pageNumber); //the page number will be query number or the default 1.
@@ -37,7 +27,7 @@ const getProductsWithPagination = asyncHandler(async (req, res) => {
 
     const count = await Product.countDocuments({ ...keyword }); //for mongodb database
 
-    const products = await Product.find({ ...keyword }).limit(pageSize).skip(pageSize * (page - 1));
+    const products = await Product.find({ ...keyword }).sort({ _id: 1 }).limit(pageSize).skip(pageSize * (page - 1));
 
     res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
@@ -257,7 +247,6 @@ const getProductsByPrices = asyncHandler(async (req, res) => {
 
 
 export {
-    getProducts,
     getProductsById,
     createProduct,
     updateProductsById,

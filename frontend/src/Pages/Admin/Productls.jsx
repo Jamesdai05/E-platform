@@ -26,7 +26,7 @@ const Productls = () => {
     // console.log("delete", id);
     if(window.confirm("Aryou sure you want to delete the product?")){
       try {
-        await deleteProduct(id);
+        await deleteProduct(id).unwrap();
         refetch();
         toast.success("Product deleted!",{position:"top-center"})
       } catch (error) {
@@ -38,7 +38,7 @@ const Productls = () => {
   const handleCreate = async () => {
     if (window.confirm("Are you sure you want to create a product?")) {
       try {
-        await createProduct();
+        await createProduct().unwrap();
         refetch();
         toast.success("Template Product is created.", {
           position: "top-center",

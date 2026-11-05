@@ -27,7 +27,7 @@ const ProductEdit = () => {
   const {data:product,isLoading,refetch,error}=useGetProductDetailsQuery(productId);
 
   const [ updateProduct,{isLoading : loadingUpdate}] = useUpdateProductMutation();
-  const [uploadProductImage,{isloading:loadingImage}] = useUploadProductImageMutation();
+  const [uploadProductImage,{isLoading:loadingImage}] = useUploadProductImageMutation();
 
   const navigate=useNavigate();
 

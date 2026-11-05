@@ -3,6 +3,35 @@ import User from '../models/userModel.js';
 import jwt from "jsonwebtoken";
 import generateToken from "../utils/tokengeneration.js";
 
+const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+// Tries the exact address first, then ignores capitals, so accounts saved before
+// emails were stored in lowercase can still be found.
+const findUserByEmail = async (email) =>
+  (await User.findOne({ email })) ||
+  User.findOne({ email }).collation({ locale: "en", strength: 2 });
+
+// Changes a user's email if it is really different, refusing bad or taken addresses
+const applyEmailChange = async (user, newEmail, res) => {
+  if (!newEmail) return;
+
+  if (typeof newEmail !== "string" || !isValidEmail(normalizeEmail(newEmail))) {
+    res.status(400);
+    throw new Error("Please enter a valid email address");
+  }
+
+  const email = normalizeEmail(newEmail);
+  if (email === user.email.toLowerCase()) return;
+
+  if (await findUserByEmail(email)) {
+    res.status(400);
+    throw new Error("Email is already in use");
+  }
+  user.email = email;
+};
+
 // Rules for a new password, returning the problem or null. Login does not use this,
 // so accounts with an older, shorter password can still sign in.
 const getPasswordError = (password) => {
@@ -32,9 +61,9 @@ const authUser=asyncHandler(async(req,res)=>{
     throw new Error("Invalid email or password!")
   }
 
-   const user = await User.findOne({ email });
+   const user = await findUserByEmail(email.trim());
   // console.log(user)
-  if(user  && (await user.matchPassword(password) && !user.isDisabled)){
+  if(user && (await user.matchPassword(password))){
     // jsonwebtoke setup
     generateToken(res,user._id)
     // const token=jwt.sign({useId:user._id},process.env.JWT_SECRET,{
@@ -66,11 +95,18 @@ const authUser=asyncHandler(async(req,res)=>{
 
 const registrationOfUser=asyncHandler(async(req,res)=>{
   // res.send("register User!")
-  const {email,name,password}=req.body;
+  const {name,password}=req.body;
 
-  if(typeof email !== "string" || typeof name !== "string" || typeof password !== "string"){
+  if(typeof req.body.email !== "string" || typeof name !== "string" || typeof password !== "string"){
     res.status(400);
     throw new Error("Invalid user data!")
+  }
+
+  const email=normalizeEmail(req.body.email);
+
+  if(!isValidEmail(email)){
+    res.status(400);
+    throw new Error("Please enter a valid email address")
   }
 
   const passwordError=getPasswordError(password);
@@ -79,7 +115,7 @@ const registrationOfUser=asyncHandler(async(req,res)=>{
     throw new Error(passwordError)
   }
 
-  const isUserExists=await User.findOne({email});
+  const isUserExists=await findUserByEmail(email);
 
   if(isUserExists){
     res.status(400);
@@ -132,16 +168,16 @@ const getUserProfile=asyncHandler(async(req,res)=>{
   const user=await User.findById(req.user._id);
 
   if(user){
-    res.status(200).json({
+    return res.status(200).json({
       _id:user._id,
       name:user.name,
       email:user.email,
       isAdmin:user.isAdmin,
     })
-
-    res.status(404)
-    throw new Error("User not found.")
   }
+
+  res.status(404)
+  throw new Error("User not found.")
 })
 
 // @desc  update user profile
@@ -154,7 +190,7 @@ const updateUserProfile=asyncHandler(async(req,res)=>{
 
   if(user){
     user.name = req.body.name || user.name;
-    user.email= req.body.email || user.email;
+    await applyEmailChange(user,req.body.email,res);
 
     // if there is password in the req body
     if(req.body.password){
@@ -236,8 +272,11 @@ const updateUserById=asyncHandler(async(req,res)=>{
   const user=await User.findById(req.params.id);
   if(user){
     user.name =req.body.name || user.name;
-    user.email =req.body.email || user.email;
-    user.isAdmin = Boolean(req.body.isAdmin)
+    await applyEmailChange(user,req.body.email,res);
+    // leaving isAdmin out of the request must not remove admin rights
+    if(req.body.isAdmin !== undefined){
+      user.isAdmin = Boolean(req.body.isAdmin)
+    }
 
     const updatedUser = await user.save();
     return res.status(201).json({
